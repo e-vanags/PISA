@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="lv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Latviešu un krievu valodas plūsmu lasītprasme OECD PISA 2003.–2025. gadā ar 95 procentu ticamības intervāliem.">
+  <meta property="og:title" content="PISA lasītprasmes datu salīdzinājums 2003–2025">
+  <meta property="og:description" content="Latviešu un krievu valodas plūsmu lasītprasme OECD PISA 2003.–2025. gadā ar 95 procentu ticamības intervāliem.">
+  <title>PISA lasītprasmes datu salīdzinājums 2003–2025</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+  <style>
+      * { box-sizing: border-box; }
+      html { color-scheme: light dark; }
+      body { margin: 0; }
+      img { max-width: 100%; }
+      [hidden] { display: none !important; }
+    :root{
+      color-scheme: light;
+      --plane:#f4f4f1; --surface:#fcfcfb;
+      --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+      --grid:#e1e0d9; --axis:#c3c2b7; --hair:rgba(11,11,11,.10);
+      --s1:#2a78d6; --s2:#eb6834;
+      --s1-band:rgba(42,120,214,.19); --s2-band:rgba(235,104,52,.19);
+      --ref:#898781;
+      --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+      --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    }
+    @media (prefers-color-scheme: dark){
+      :root:not([data-theme="light"]){
+        color-scheme: dark;
+        --plane:#0d0d0d; --surface:#1a1a19;
+        --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+        --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,.10);
+        --s1:#3987e5; --s2:#d95926;
+        --s1-band:rgba(57,135,229,.24); --s2-band:rgba(217,89,38,.24);
+        --ref:#898781;
+      }
+    }
+    :root[data-theme="dark"]{
+      color-scheme: dark;
+      --plane:#0d0d0d; --surface:#1a1a19;
+      --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,.10);
+      --s1:#3987e5; --s2:#d95926;
+      --s1-band:rgba(57,135,229,.24); --s2-band:rgba(217,89,38,.24);
+      --ref:#898781;
+    }
+    body{background:var(--surface); color:var(--ink); font-family:var(--sans);
+         font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;}
+    .wrap{max-width:1060px; margin:0 auto; padding:48px 24px 80px;
+          display:flex; flex-direction:column; gap:0;}
+    header{display:flex; flex-direction:column; gap:9px; max-width:70ch;
+            padding-bottom:26px;}
+    h1{margin:0; font-size:clamp(23px,2.6vw,30px); line-height:1.22;
+       font-weight:700; letter-spacing:-.015em; text-wrap:balance;}
+    .standfirst{margin:0; color:var(--ink-2); font-size:15.5px; max-width:66ch;}
+    .panel{display:flex; flex-direction:column; gap:6px;
+           padding:34px 0 6px; border-top:1px solid var(--hair);}
+    .panel:first-of-type{border-top:none; padding-top:26px;}
+    .panel h2{margin:0 0 2px; font-size:17.5px; font-weight:600; letter-spacing:-.01em;}
+    .panel .sub{margin:0; color:var(--ink-2); font-size:13.5px; max-width:72ch;}
+    .legend{display:flex; flex-wrap:wrap; gap:6px 20px; margin:6px 0 2px;
+            font-size:13px; color:var(--ink-2);}
+    .legend span{display:inline-flex; align-items:center; gap:7px;}
+    .sw{width:22px; height:0; border-top-width:3px; border-top-style:solid;
+        border-radius:2px; display:inline-block;}
+    .plot{position:relative; overflow-x:auto;}
+    svg{display:block; width:100%; height:auto; min-width:640px;}
+    .tip{position:absolute; pointer-events:none; opacity:0; transition:opacity .1s;
+         background:var(--surface); border:1px solid var(--axis); border-radius:3px;
+         padding:9px 11px; font-size:12.5px; box-shadow:0 6px 18px rgba(0,0,0,.13);
+         min-width:186px; z-index:5;}
+    .tip .y{font-family:var(--mono); font-size:12px; color:var(--muted);
+            letter-spacing:.06em; margin-bottom:5px;}
+    .tip .row{display:flex; align-items:baseline; gap:8px; justify-content:space-between;}
+    .tip .row b{font-family:var(--mono); font-weight:500; font-variant-numeric:tabular-nums;}
+    .tip .dot{width:8px; height:8px; border-radius:50%; display:inline-block;
+              margin-right:6px; vertical-align:-1px;}
+    .changes{margin:10px 0 0; display:grid; grid-template-columns:auto 1fr;
+             gap:9px 20px; align-items:baseline;}
+    .changes dt{font-family:var(--mono); font-size:12.5px; color:var(--ink-2);
+                white-space:nowrap;}
+    .changes dd{margin:0; font-size:13.5px; color:var(--ink-2); max-width:70ch;}
+    details.panel > summary{cursor:pointer; list-style:none; display:flex;
+        flex-wrap:wrap; align-items:baseline; gap:4px 12px;
+        font-size:17.5px; font-weight:600; letter-spacing:-.01em; color:var(--ink);}
+    details.panel > summary::-webkit-details-marker{display:none;}
+    details.panel > summary::before{content:"+"; font-family:var(--mono);
+        font-weight:400; color:var(--muted); margin-right:2px;}
+    details.panel[open] > summary::before{content:"−";}
+    details.panel > summary:focus-visible{outline:2px solid var(--s1); outline-offset:3px;}
+    details.panel > summary .hint{font-size:13px; font-weight:400; color:var(--muted);
+        letter-spacing:0;}
+    .details-body{display:flex; flex-direction:column; gap:6px; padding-top:10px;}
+    table{border-collapse:collapse; width:100%; font-size:13px;
+          font-variant-numeric:tabular-nums;}
+    caption{text-align:left; color:var(--ink-2); font-size:13.5px; padding-bottom:10px;}
+    th,td{padding:7px 9px; text-align:right; border-bottom:1px solid var(--grid);
+          white-space:nowrap;}
+    th:first-child,td:first-child{text-align:left; font-weight:500;}
+    thead th{font-family:var(--mono); font-weight:500; font-size:11.5px;
+             color:var(--muted); letter-spacing:.05em; border-bottom:1px solid var(--axis);}
+    tbody tr:last-child td{border-bottom:none;}
+    .panel h3{margin:16px 0 2px; font-size:14px; font-weight:600; letter-spacing:-.005em;}
+    .defs{margin:4px 0 0; display:grid; grid-template-columns:auto 1fr; gap:5px 16px;
+          font-size:13.5px; color:var(--ink-2); align-items:baseline;}
+    .defs dt{font-family:var(--mono); font-weight:500; color:var(--ink); white-space:nowrap;}
+    .defs dd{margin:0;}
+    .legnote{margin:0 0 4px; font-size:12.5px; color:var(--muted); max-width:70ch;}
+    .legnote b{font-family:var(--mono); color:var(--ink-2); font-weight:500;}
+    ul.sub{margin:4px 0 0; padding-left:20px;}
+    ul.sub li{margin-bottom:3px;}
+    .note{font-size:13px; color:var(--ink-2); max-width:74ch;}
+    .note b{color:var(--ink); font-weight:600;}
+    footer{font-family:var(--mono); font-size:11.5px; color:var(--muted);
+           letter-spacing:.04em; border-top:1px solid var(--hair);
+           padding-top:16px; margin-top:34px;}
+    @media (prefers-reduced-motion: reduce){*{transition:none!important;}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>PISA lasītprasmes datu salīdzinājums, 2003.–2025. gads</h1>
+    <p class="standfirst">Latvijas 15 gadus veco skolēnu lasītprasmes rezultāti latviešu un krievu valodas plūsmās ar 95 % ticamības intervāliem. Šajā analīzē “valodas plūsma” apzīmē skolēnu grupu pēc anketā norādītās mājās lietotās valodas. Iepriekš šī datu rinda aptvēra periodu no 2015. gada; pievienojot PISA 2003.–2012. gada mikrodatus, tagad iespējams analizēt 22 gadu periodu.</p>
+  </header>
+
+  <section class="panel">
+    <h2>Vidējais lasītprasmes rezultāts</h2>
+    <p class="sub">Iekrāsotā josla ap līniju attēlo 95 % ticamības intervālu. Gadu ass veidota atbilstoši faktiskajam laika intervālam, tāpēc atstarpe starp 2018. un 2022. gadu ir lielāka nekā starp pārējiem cikliem. PISA 2021 cikls pandēmijas dēļ tika pārcelts uz 2022. gadu.</p>
+    <div class="legend">
+      <span><i class="sw" style="border-color:var(--s1)"></i>A plūsma: mājās galvenokārt latviešu valoda</span>
+      <span><i class="sw" style="border-color:var(--s2)"></i>B plūsma: mājās galvenokārt krievu valoda</span>
+      <span><i class="sw" style="border-color:var(--ref); border-top-width:2px"></i>Latvija kopā</span>
+    </div>
+    <p class="legnote">Plūsmas noteiktas pēc mainīgā <b>LANGN</b>. Tas ir skolēna anketā norādītais mājās lietotās valodas mainīgais. Plūsmas nav noteiktas pēc mācību valodas vai izglītības programmas.</p>
+    <div class="plot" id="plot1"><div class="tip" id="tip1"></div></div>
+  </section>
+
+  <section class="panel">
+    <h2>Skolēnu īpatsvars, kuri nesasniedz 2. kompetences līmeni</h2>
+    <p class="sub">Rezultāts zem 2. kompetences līmeņa norāda uz nepietiekamu pamatprasmju apguvi lasīšanā. A plūsmā skolēnu īpatsvars zem šā līmeņa ir palielinājies katrā mērījumu ciklā kopš 2009. gada.</p>
+    <div class="legend">
+      <span><i class="sw" style="border-color:var(--s1)"></i>A plūsma: mājās galvenokārt latviešu valoda</span>
+      <span><i class="sw" style="border-color:var(--s2)"></i>B plūsma: mājās galvenokārt krievu valoda</span>
+    </div>
+    <div class="plot" id="plot2"><div class="tip" id="tip2"></div></div>
+  </section>
+
+
+
+
+
+  <section class="panel">
+    <h2>Šie ir nekoriģēti rādītāji</h2>
+    <p class="sub">Aplēses aprēķinātas oficiālajā OECD PISA skalā, izmantojot publiskotās ticamās vērtības. Papildu korekcijas nav piemērotas, tostarp nav veikta:</p>
+    <ul class="sub">
+      <li><b>iesaistes un ātrās minēšanas korekcija</b>: šā projekta uzdevumu līmeņa analīze liecina, ka daļa 2025. gada krituma varētu būt saistīta ar testa formātu; oficiālajā skalā šāda korekcija nav veikta;</li>
+      <li><b>2018. gada testa formāta maiņas korekcija</b>: lasīšanas novērtējumā 2018. gadā pirmo reizi tika izmantota daudzpakāpju adaptīvā testēšana;</li>
+      <li><b>izlases sastāva standartizācija</b>: grupu īpatsvars starp cikliem mainās;</li>
+      <li><b>izslēgšanas un aptvēruma atšķirību korekcija</b> starp cikliem.</li>
+    </ul>
+    <p class="note" style="margin-top:16px"><b>Kas jāņem vērā, interpretējot rezultātus.</b> Pirms rezultātu interpretēšanas jāņem vērā divi ierobežojumi. Pirmkārt, PISA 2018 lasīšanas novērtējumā pirmo reizi tika izmantota daudzpakāpju adaptīvā testēšana. Tādēļ daļa no izmaiņām zemāko rezultātu grupā teorētiski varētu būt saistīta ar testa formāta maiņu, taču tas šajā analīzē vēl nav pārbaudīts. Otrkārt, krievu valodas plūsmas īpatsvars Latvijas izlasē no 2003. līdz 2009. gadam samazinās no 44,4 % līdz 29,3 %. Pašlaik nav noskaidrots, cik lielā mērā šo pārmaiņu nosaka reālas populācijas izmaiņas, jautājuma formulējums vai izlases sastāvs.</p>
+    <p class="note" style="margin-top:12px"><b>Kāpēc līnijas ir pārtrauktas.</b> Katrā PISA ciklā tiek izmantota jauna skolēnu izlase; tie nav vieni un tie paši skolēni, kuriem sekots laika gaitā. Starp diviem mērījumu gadiem lasītprasme nav mērīta, tāpēc grafika punkti nav savienoti ar nepārtrauktu līniju. Savienojošie nogriežņi tikai palīdz saskatīt pārmaiņu virzienu un neatspoguļo rezultātus starp mērījumu gadiem.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Pārmaiņas starp atsevišķiem cikliem</h2>
+    <p class="sub">Daži salīdzinājumi, kas izriet no augstāk redzamajām aplēsēm.</p>
+    <dl class="changes" id="moments"></dl>
+  </section>
+
+  <section class="panel">
+    <table id="tbl">
+      <caption>Precīzās aplēses. Iekavās norādīta standartkļūda, kas ietver izlases un imputācijas dispersiju, bet neietver saites kļūdu.</caption>
+    </table>
+  </section>
+
+  <details class="panel" id="metode">
+    <summary><span>Statistiskā piezīme</span><span class="hint">metodika, apzīmējumi un jutīguma analīze</span></summary>
+    <div class="details-body">
+    <p class="sub">Šajā sadaļā aprakstīts, kā aplēses aprēķinātas, kā novērtēta to nenoteiktība un kādi nenoteiktības avoti aprēķinos nav iekļauti.</p>
+
+    <h3>Apzīmējumi</h3>
+    <dl class="defs">
+      <dt>M</dt><dd>ticamo vērtību (<i>plausible values</i>) skaits: <b>5</b> katrā ciklā no 2003. līdz 2012. gadam un <b>10</b> katrā ciklā no 2015. gada</dd>
+      <dt>θ<sub>m</sub></dt><dd>svērtā aplēse, rēķināta ar <i>m</i>-to ticamo vērtību un galīgo skolēna svaru W_FSTUWT</dd>
+      <dt>θ</dt><dd>publicētā aplēse, θ = (1/M) Σ θ<sub>m</sub></dd>
+      <dt>U</dt><dd>izlases dispersija, aprēķināta ar BRR metodi un Fay koeficientu <i>k</i> = 0,5; izmantoti <i>G</i> = 80 replikātsvari un dalītājs G(1−k)² = <b>20</b>. Dispersija aprēķināta katrai ticamajai vērtībai un pēc tam vidējota.</dd>
+      <dt>B</dt><dd>imputācijas dispersija starp M aplēsēm</dd>
+      <dt>V</dt><dd>kopējā dispersija pēc Rubina: <b>V = U + (1 + 1/M)·B</b>; SE = √V</dd>
+      <dt>γ</dt><dd>trūkstošās informācijas daļa: γ = (1 + 1/M)·B / V</dd>
+      <dt>LE</dt><dd>saites kļūda: nenoteiktība, kas rodas, sasaistot PISA skalu starp dažādiem cikliem; tā nav atkarīga no izlases lieluma</dd>
+    </dl>
+
+    <h3>Nenoteiktības sastāvs</h3>
+    <p class="sub">Visos aprēķinos lielāko daļu kopējās nenoteiktības veido izlases dispersija. Trūkstošās informācijas daļa γ ir no 0,006 līdz 0,186, tāpēc Rubina brīvības pakāpes ir mērāmas simtos vai tūkstošos un t<sub>0,975</sub> vērtība ir no 1,960 līdz 1,969. <b>Salīdzinājumā ar koeficientu 1,96 neviena ticamības intervāla robeža nemainās vairāk par 0,06 punktiem</b>, tāpēc grafikā izmantots koeficients 1,96.</p>
+
+    <h3>Saites kļūda, salīdzinot dažādus PISA ciklus</h3>
+    <p class="sub">Salīdzinot rezultātus starp dažādiem PISA cikliem, standartkļūdā jāņem vērā arī saites kļūda: SE(d) = √(V₁ + V₂ + LE²). PISA 2022 rezultātu I sējuma A7 pielikumā 2022. un 2018. gada lasīšanas rezultātu salīdzinājumam norādīts <b>LE = 1,47</b>, kā arī atzīmēts, ka senāku ciklu salīdzinājumos saites kļūda var būt lielāka. Salīdzinot grupas viena cikla ietvaros, piemēram, A un B plūsmu vienā gadā, saites kļūda nav jāiekļauj.</p>
+    <p class="sub" style="margin-top:8px">Publicētā tabula ar LE vērtībām katram ciklu pārim ir attēls, tāpēc skaitļi no tās nav izgūstami. Tomēr tos var atvasināt: PISA 2022 rezultātu I sējuma tabula I.B1.5.5 norāda gan Latvijas trenda starpības, gan to standartkļūdas, kas saites kļūdu jau ietver. No tām atvasinātās vērtības ir <b>1,49</b> salīdzinājumam ar 2018. gadu, kas praktiski sakrīt ar publicēto 1,47, un <b>3,6 līdz 8,6</b> salīdzinājumiem ar 2003.–2015. gadu. Tāpēc zemāk esošajā jutīguma analīzē gariem salīdzinājumiem reālistiskākā ir kolonna LE = 5.</p>
+    <div class="plot"><table id="tbl2"></table></div>
+    <p class="sub" style="margin-top:10px">Par statistiski nozīmīgu 5 % līmenī uzskatīts salīdzinājums, kuram |z| &gt; 1,96. <b>Viena A plūsmas salīdzinājuma secinājums ir atkarīgs no pieņemtās saites kļūdas.</b> Salīdzinājums 2003 → 2015 vairs nav statistiski nozīmīgs jau tad, ja LE pieņem 1,5 punktu apmērā, tāpēc ar atvasinātajām vērtībām tas nav uzskatāms par nozīmīgu. Salīdzinājumi 2018 → 2022 un 2015 → 2022 ar atvasinātajām saites kļūdām (attiecīgi 1,49 un 3,58) saglabā statistisko nozīmību: z ir 2,31 un 2,21. Pārējo salīdzinājumu statistiskā nozīmība saglabājas pie visām pārbaudītajām LE vērtībām.</p>
+
+    </div>
+  </details>
+
+  <footer>Avots: OECD PISA 2003.–2025. gada mikrodati, Latvijas izlases. Aprēķinu skripts: <code>R/pisa2025/43_ab_rinda_no_2003.R</code>.<br>Datu sagatavošana, agregācija un vizualizācija veikta ar <i>Anthropic</i> atbalstu.</footer>
+</div>
+
+<script>
+const YEARS=[2003,2006,2009,2012,2015,2018,2022,2025];
+const D={
+ A:{vid:[499.19,483.07,487.69,489.13,489.36,486.60,478.51,459.15],
+    se:[4.44,3.78,3.38,3.38,2.12,1.90,2.53,1.86],
+    zem:[15.24,19.75,15.43,16.61,17.02,19.37,21.31,28.49],
+    zse:[1.46,1.43,1.48,1.41,1.05,0.90,1.16,0.95]},
+ B:{vid:[481.19,475.89,479.90,492.08,488.65,468.29,473.43,376.15],
+    se:[4.76,6.48,6.81,5.55,3.15,2.98,4.45,2.98],
+    zem:[20.81,22.62,20.56,16.34,17.48,26.42,23.57,65.07],
+    zse:[1.67,2.32,2.51,2.34,1.38,1.52,1.68,1.35]},
+ V:{vid:[490.56,479.49,483.96,488.69,487.76,478.70,474.57,429.68],
+    se:[3.67,3.73,2.96,2.39,1.80,1.62,2.46,2.03]}};
+const CSS=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const nf=(v,d=1)=>v.toFixed(d).replace('.',',');
+
+function draw(host,tipEl,cfg){
+  host.querySelectorAll('svg').forEach(s=>s.remove());
+  const W=960,H=cfg.h,M={t:cfg.mt,r:112,b:40,l:52};
+  const iw=W-M.l-M.r, ih=H-M.t-M.b;
+  const PAD=0.7;  // gados, lai galapunkti nepieskartos ass malai
+  const x=y=>M.l+(y-2003+PAD)/(2025-2003+2*PAD)*iw;
+  const yy=v=>M.t+(cfg.max-v)/(cfg.max-cfg.min)*ih;
+  const NS='http://www.w3.org/2000/svg';
+  const el=(t,a={})=>{const e=document.createElementNS(NS,t);
+    for(const k in a)e.setAttribute(k,a[k]);return e;};
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':cfg.alt});
+
+  cfg.ticks.forEach(t=>{
+    svg.appendChild(el('line',{x1:M.l,x2:M.l+iw,y1:yy(t),y2:yy(t),
+      stroke:CSS('--grid'),'stroke-width':1}));
+    const lb=el('text',{x:M.l-10,y:yy(t)+4,'text-anchor':'end',
+      fill:CSS('--muted'),'font-size':11.5,'font-family':CSS('--mono')});
+    lb.textContent=cfg.fmt(t); svg.appendChild(lb);
+  });
+  svg.appendChild(el('line',{x1:M.l,x2:M.l+iw,y1:M.t+ih,y2:M.t+ih,
+    stroke:CSS('--axis'),'stroke-width':1}));
+  YEARS.forEach(g=>{
+    const lb=el('text',{x:x(g),y:M.t+ih+22,'text-anchor':'middle',
+      fill:CSS('--muted'),'font-size':11.5,'font-family':CSS('--mono')});
+    lb.textContent=g; svg.appendChild(lb);
+  });
+
+  cfg.series.forEach(s=>{
+    if(s.band){
+      let up='',dn='';
+      YEARS.forEach((g,i)=>{up+=(i?' L':'M')+x(g)+' '+yy(s.v[i]+1.96*s.e[i]);});
+      for(let i=YEARS.length-1;i>=0;i--)dn+=' L'+x(YEARS[i])+' '+yy(s.v[i]-1.96*s.e[i]);
+      svg.appendChild(el('path',{d:up+dn+' Z',fill:s.band,stroke:'none'}));
+    }
+  });
+  const GAP=8;  // atstarpe pie katra mērījuma punkta
+  cfg.series.forEach(s=>{
+    // Katrs cikls ir cita skolēnu izlase, tāpēc punkti netiek savienoti ar
+    // nepārtrauktu līniju. Nogrieznis starp diviem mērījumiem ir tikai
+    // lasīšanas palīglīdzeklis, ne apgalvojums par vērtībām starp gadiem.
+    for(let i=0;i<YEARS.length-1;i++){
+      const x1=x(YEARS[i]),y1=yy(s.v[i]),x2=x(YEARS[i+1]),y2=yy(s.v[i+1]);
+      const L=Math.hypot(x2-x1,y2-y1), ux=(x2-x1)/L, uy=(y2-y1)/L;
+      if(L<=2*GAP+2) continue;
+      svg.appendChild(el('line',{x1:x1+ux*GAP,y1:y1+uy*GAP,
+        x2:x2-ux*GAP,y2:y2-uy*GAP,stroke:s.col,'stroke-width':s.w||2,
+        'stroke-linecap':'round'}));
+    }
+    if(!s.noDots)YEARS.forEach((g,i)=>{
+      svg.appendChild(el('circle',{cx:x(g),cy:yy(s.v[i]),r:4.5,fill:s.col,
+        stroke:CSS('--surface'),'stroke-width':2}));});
+    const yE=yy(s.v[s.v.length-1]);
+    const t=el('text',{x:M.l+iw+12,y:yE-1,fill:s.col,
+      'font-size':12,'font-weight':600}); t.textContent=s.lab;
+    svg.appendChild(t);
+    const vE=el('text',{x:M.l+iw+12,y:yE+14,fill:s.col,'font-size':12.5,
+      'font-weight':600,'font-family':CSS('--mono')});
+    vE.textContent=(cfg.fmtEnd||cfg.fmt)(s.v[s.v.length-1]);
+    svg.appendChild(vE);
+  });
+
+  (cfg.notes||[]).forEach(n=>{
+    const px=x(n.g),py=yy(n.v);
+    svg.appendChild(el('line',{x1:px,y1:py+n.dy*0.28,x2:px+n.lx,y2:py+n.dy,
+      stroke:CSS('--axis'),'stroke-width':1}));
+    const a=el('text',{x:px+n.lx+(n.lx<0?-4:4),y:py+n.dy,
+      'text-anchor':n.lx<0?'end':'start',fill:CSS('--ink'),
+      'font-size':12,'font-weight':600}); a.textContent=n.t; svg.appendChild(a);
+    if(n.t2){const b=el('text',{x:px+n.lx+(n.lx<0?-4:4),y:py+n.dy+15,
+      'text-anchor':n.lx<0?'end':'start',fill:CSS('--ink-2'),'font-size':11.5,
+      'font-family':CSS('--mono')}); b.textContent=n.t2; svg.appendChild(b);}
+  });
+
+  const cross=el('line',{y1:M.t,y2:M.t+ih,stroke:CSS('--axis'),
+    'stroke-width':1,'stroke-dasharray':'3 3',opacity:0});
+  svg.appendChild(cross);
+  const hit=el('rect',{x:M.l,y:M.t,width:iw,height:ih,fill:'transparent'});
+  svg.appendChild(hit);
+  const move=ev=>{
+    const r=svg.getBoundingClientRect();
+    const gx=2003-PAD+((ev.clientX-r.left)/r.width*W-M.l)/iw*(2025-2003+2*PAD);
+    let bi=0,bd=1e9;
+    YEARS.forEach((g,i)=>{const d=Math.abs(g-gx); if(d<bd){bd=d;bi=i;}});
+    cross.setAttribute('x1',x(YEARS[bi])); cross.setAttribute('x2',x(YEARS[bi]));
+    cross.setAttribute('opacity',1);
+    tipEl.innerHTML='<div class="y">'+YEARS[bi]+'</div>'+cfg.series.filter(s=>!s.skipTip)
+      .map(s=>'<div class="row"><span><i class="dot" style="background:'+s.col+'"></i>'+
+        s.lab+'</span><b>'+cfg.fmt(s.v[bi])+' <span style="color:var(--muted)">±'+
+        nf(1.96*s.e[bi])+'</span></b></div>').join('');
+    const px=x(YEARS[bi])/W*r.width;
+    tipEl.style.opacity=1;
+    tipEl.style.left=Math.min(Math.max(px-93,0),r.width-200)+'px';
+    tipEl.style.top=(cfg.tipTop)+'px';
+  };
+  svg.addEventListener('mousemove',move);
+  svg.addEventListener('mouseleave',()=>{tipEl.style.opacity=0;cross.setAttribute('opacity',0);});
+  host.appendChild(svg);
+}
+
+function render(){
+  draw(document.getElementById('plot1'),document.getElementById('tip1'),{
+    h:470,mt:56,min:360,max:512,ticks:[360,380,400,420,440,460,480,500],
+    fmt:v=>nf(v,0),fmtEnd:v=>nf(v,1),tipTop:10,
+    alt:'Latviešu un krievu valodas plūsmu vidējais lasīšanas sasniegums 2003.-2025. gadā ar ticamības intervāliem',
+    series:[
+      {v:D.V.vid,e:D.V.se,col:CSS('--ref'),lab:'Latvija kopā',noDots:true,w:1.5,skipTip:false},
+      {v:D.A.vid,e:D.A.se,col:CSS('--s1'),lab:'A plūsma',band:CSS('--s1-band')},
+      {v:D.B.vid,e:D.B.se,col:CSS('--s2'),lab:'B plūsma',band:CSS('--s2-band')}],
+    notes:[
+      {g:2003,v:499.19,lx:14,dy:-40,t:'Augstākais rezultāts periodā',t2:'499,2. Vēlāk nav sasniegts'},
+      {g:2012,v:492.08,lx:-8,dy:-30,t:'B plūsmas rezultāts augstāks',t2:'+3,0 punkti'},
+      {g:2018,v:468.29,lx:-10,dy:34,t:'B plūsma: −20,4 punkti',t2:'A plūsma: −2,8 punkti'},
+      {g:2025,v:376.15,lx:-36,dy:-42,t:'Kopš 2022. gada: −97,3 punkti',t2:'Kopš 2003. gada: −105,0 punkti'}]
+  });
+  draw(document.getElementById('plot2'),document.getElementById('tip2'),{
+    h:360,mt:44,min:10,max:70,ticks:[10,20,30,40,50,60,70],
+    fmt:v=>nf(v,0)+' %',fmtEnd:v=>nf(v,1)+' %',tipTop:8,
+    alt:'Skolēnu īpatsvars zem 2. kompetences līmeņa 2003.-2025. gadā',
+    series:[
+      {v:D.A.zem,e:D.A.zse,col:CSS('--s1'),lab:'A plūsma',band:CSS('--s1-band')},
+      {v:D.B.zem,e:D.B.zse,col:CSS('--s2'),lab:'B plūsma',band:CSS('--s2-band')}],
+    notes:[
+      {g:2003,v:15.24,lx:8,dy:26,t:'Zemākais rādītājs periodā',t2:'15,2 %'},
+      {g:2025,v:65.07,lx:-34,dy:26,t:'Aptuveni divi no trim',t2:'2003. gadā, aptuveni katrs piektais'}]
+  });
+}
+render();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+addEventListener('resize',()=>{clearTimeout(window.__t);window.__t=setTimeout(render,150);});
+
+const MOM=[
+ ['2003','Latviešu valodas plūsmas augstākais rezultāts aplūkotajā periodā ir 499,2 punkti. Nevienā no nākamajiem septiņiem cikliem šis līmenis vairs netiek sasniegts.'],
+ ['2003 → 2006','Latviešu valodas plūsmā rezultāts samazinājās par 16,1 punktu, krievu valodas plūsmā par 5,3 punktiem. Otrais samazinājums nebija statistiski nozīmīgs.'],
+ ['2012','Vienīgais cikls aplūkotajā periodā, kurā krievu valodas plūsmas vidējais rezultāts ir augstāks nekā latviešu valodas plūsmai, par 3,0 punktiem. 2015. gadā abu plūsmu rezultāti ir gandrīz vienādi.'],
+ ['2018','Krievu valodas plūsmā rezultāts samazinājās par 20,4 punktiem, latviešu valodas plūsmā par 2,8 punktiem.'],
+ ['2003 → 2025','Krievu valodas plūsmas rezultāts ir par 105,0 punktiem zemāks nekā 2003. gadā, latviešu valodas plūsmas rezultāts par 40,0 punktiem zemāks.']];
+document.getElementById('moments').innerHTML=MOM.map(m=>
+ '<dt>'+m[0]+'</dt><dd>'+m[1]+'</dd>').join('');
+
+const T=document.getElementById('tbl');
+let h='<thead><tr><th>Rādītājs</th>'+YEARS.map(y=>'<th>'+y+'</th>').join('')+'</tr></thead><tbody>';
+const rows=[['A plūsma: vidējais rezultāts',D.A.vid,D.A.se,1],
+            ['B plūsma: vidējais rezultāts',D.B.vid,D.B.se,1],
+            ['Latvija kopā: vidējais rezultāts',D.V.vid,D.V.se,1],
+            ['A plūsma: zem 2. kompetences līmeņa, %',D.A.zem,D.A.zse,1],
+            ['B plūsma: zem 2. kompetences līmeņa, %',D.B.zem,D.B.zse,1]];
+rows.forEach(r=>{h+='<tr><td>'+r[0]+'</td>'+r[1].map((v,i)=>
+  '<td>'+nf(v,r[3])+' <span style="color:var(--muted)">('+nf(r[2][i])+')</span></td>').join('')+'</tr>';});
+T.innerHTML=h+'</tbody>';
+
+const SENS=[
+ ['A','2003 → 2006',-16.1,5.83,[2.76,2.68,2.46,2.10]],
+ ['A','2015 → 2018',-2.8,2.85,[0.97,0.86,0.67,0.48]],
+ ['A','2018 → 2022',-8.1,3.17,[2.55,2.31,1.85,1.37]],
+ ['A','2003 → 2015',-9.8,4.92,[2.00,1.91,1.71,1.40]],
+ ['A','2015 → 2022',-10.8,3.31,[3.28,2.99,2.43,1.81]],
+ ['A','2022 → 2025',-19.4,3.14,[6.16,5.56,4.46,3.28]],
+ ['A','2003 → 2025',-40.0,4.81,[8.33,7.95,7.06,5.77]],
+ ['B','2015 → 2018',-20.4,4.34,[4.69,4.43,3.86,3.07]],
+ ['B','2015 → 2022',-15.2,5.46,[2.79,2.69,2.44,2.06]],
+ ['B','2022 → 2025',-97.3,5.36,[18.15,17.48,15.84,13.27]],
+ ['B','2003 → 2025',-105.0,5.62,[18.69,18.06,16.49,13.96]]];
+let h2='<caption>Absolūtā z vērtība ciklu savstarpējiem salīdzinājumiem pie dažādām saites kļūdas (LE) vērtībām. Zvaigznīte norāda |z| &gt; 1,96.</caption>'+
+ '<thead><tr><th>Plūsma</th><th>Periods</th><th>Starpība</th><th>SE bez LE</th>'+
+ '<th>LE = 0</th><th>LE = 1,5</th><th>LE = 3</th><th>LE = 5</th></tr></thead><tbody>';
+SENS.forEach(r=>{h2+='<tr><td>'+r[0]+'</td><td style="text-align:left">'+r[1]+'</td><td>'+
+ (r[2]>0?'+':'')+nf(r[2])+'</td><td>'+nf(r[3],2)+'</td>'+
+ r[4].map(z=>'<td>'+nf(z,2)+(z>1.96?'<b> *</b>':'<span style="color:var(--muted)"> —</span>')+'</td>').join('')+'</tr>';});
+document.getElementById('tbl2').innerHTML=h2+'</tbody>';
+</script>
+</body>
+</html>
