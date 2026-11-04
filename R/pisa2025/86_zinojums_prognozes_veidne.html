@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="lv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Ziņojums 2026. gada 5. novembrī: ko OECD, IEA, SPKC un VIAA dati ļauj prognozēt par tekstpratību Latvijā. Interaktīvi grafiki ar slāņiem un filtriem.">
+<title>Ieskats aktuālajos OECD, IEA, SPKC u. c. datos: ko varam prognozēt?</title>
+<style>
+  * { box-sizing: border-box; }
+  html { }
+  :root{
+    color-scheme: light;
+    --plane:#f4f4f1; --surface:#fcfcfb; --card:#ffffff;
+    --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --hair:rgba(11,11,11,.10);
+    --s1:#2a78d6; --s2:#eb6834; --k:#0f8a6e; --c:#7a57c7; --ref:#898781;
+    --good:#2e7445; --warn:#9a5b00; --bad:#b3261e;
+    --s1-band:rgba(42,120,214,.12); --bad-band:rgba(179,38,30,.10); --good-band:rgba(46,116,69,.10);
+    --sans:"Helvetica Neue",Helvetica,Arial,-apple-system,"Segoe UI",system-ui,sans-serif;
+    --mono:"Helvetica Neue",Helvetica,Arial,-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --plane:#0d0d0d; --surface:#161615; --card:#1e1e1d;
+    --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --hair:rgba(255,255,255,.12);
+    --s1:#3987e5; --s2:#d95926; --k:#35b893; --c:#a88cf0; --ref:#9a9892;
+    --good:#6cc28a; --warn:#e0a24a; --bad:#f07a6e;
+    --s1-band:rgba(57,135,229,.20); --bad-band:rgba(240,122,110,.16); --good-band:rgba(108,194,138,.16);
+  }
+  body{margin:0; background:var(--surface); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;}
+  img{max-width:100%; height:auto; display:block;}
+  a{color:var(--s1);}
+  .bar{position:sticky; top:0; z-index:20; background:var(--surface); border-bottom:1px solid var(--hair); display:flex; align-items:center; gap:10px; padding:8px 20px; font-size:13px;}
+  .bar .t{font-weight:600; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .bar button,.bar a.btn{font:inherit; font-size:12.5px; padding:5px 10px; border:1px solid var(--grid); background:var(--card); color:var(--ink); border-radius:6px; cursor:pointer; text-decoration:none;}
+  .bar button[aria-pressed="true"]{background:var(--s1); color:#fff; border-color:var(--s1);}
+  .bar .pos{font-family:var(--sans); color:var(--muted); min-width:64px; text-align:right; font-variant-numeric:tabular-nums;}
+  .progress{position:fixed; top:0; left:0; height:3px; background:var(--s1); width:0; z-index:30;}
+  nav.toc{max-width:1160px; margin:0 auto; padding:18px 24px 0; display:flex; flex-wrap:wrap; gap:6px;}
+  nav.toc a{font-size:12.5px; font-family:var(--sans); text-decoration:none; color:var(--ink-2); border:1px solid var(--grid); border-radius:999px; padding:3px 9px; background:var(--card);}
+  nav.toc a:hover{border-color:var(--s1); color:var(--s1);}
+  .wrap{max-width:1160px; margin:0 auto; padding:0 24px 80px;}
+  section.s{padding:52px 0 30px; border-top:1px solid var(--hair); scroll-margin-top:52px; position:relative;}
+  section.s:first-of-type{border-top:none;}
+  .kicker{font-family:var(--sans); font-size:12.5px; color:var(--muted); letter-spacing:.04em; text-transform:uppercase; margin:0 0 8px; display:flex; gap:14px; align-items:baseline;}
+  .kicker a.top{margin-left:auto; white-space:nowrap; flex-shrink:0; color:var(--muted); text-decoration:none; border:1px solid var(--grid); border-radius:999px; padding:1px 9px; background:var(--card); text-transform:none; letter-spacing:0;}
+  .kicker a.top:hover{color:var(--s1); border-color:var(--s1);}
+  h1{font-size:clamp(28px,4vw,44px); line-height:1.12; letter-spacing:-.02em; margin:0 0 14px; font-weight:700; text-wrap:balance;}
+  h2{font-size:clamp(22px,2.6vw,30px); line-height:1.2; letter-spacing:-.015em; margin:0 0 12px; font-weight:700; text-wrap:balance; max-width:40ch;}
+  h3{font-size:16px; margin:20px 0 6px; font-weight:600;}
+  .lead{font-size:17.5px; color:var(--ink-2); max-width:74ch; margin:0 0 16px;}
+  p{max-width:78ch;}
+  ul,ol{max-width:80ch; padding-left:22px;}
+  li{margin:5px 0;}
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:14px 0 18px;}
+  .kpi{background:var(--card); border:1px solid var(--grid); border-radius:10px; padding:12px 14px;}
+  .kpi .v{font-family:var(--sans); font-size:28px; font-weight:700; line-height:1.1; letter-spacing:-.01em; font-variant-numeric:tabular-nums;}
+  .kpi .l{font-size:12.5px; color:var(--ink-2); margin-top:4px; line-height:1.35;}
+  .kpi.bad .v{color:#7a3b32;} .kpi.good .v{color:#2f5f45;} .kpi.warn .v{color:#6f5320;} .kpi.blue .v{color:#2c4f7a;}
+  :root[data-theme="dark"] .kpi.bad .v{color:#d49287;} :root[data-theme="dark"] .kpi.good .v{color:#8cc9a4;} :root[data-theme="dark"] .kpi.warn .v{color:#d9b26a;} :root[data-theme="dark"] .kpi.blue .v{color:#8fb4e3;}
+  table{border-collapse:collapse; width:100%; font-size:14px; margin:10px 0 16px; background:var(--card);}
+  th,td{border-bottom:1px solid var(--grid); padding:7px 10px; text-align:left; vertical-align:top;}
+  th{font-weight:600; background:var(--plane); font-size:13px;}
+  td.n,th.n{text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums;}
+  tr.bad td{background:var(--bad-band);} tr.good td{background:var(--good-band);}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+  @media (max-width:820px){.two{grid-template-columns:1fr;}}
+  .box{background:var(--plane); border-left:4px solid var(--s1); padding:12px 16px; border-radius:0 8px 8px 0; margin:14px 0; max-width:82ch;}
+  .box.bad{border-color:var(--bad);} .box.good{border-color:var(--good);} .box.warn{border-color:var(--warn);}
+  .box p:last-child{margin-bottom:0;}
+  details.notes{margin-top:16px; border:1px solid var(--grid); border-radius:8px; padding:8px 16px; background:var(--plane); max-width:90ch;}
+  details.notes summary{cursor:pointer; font-size:13.5px; color:var(--ink-2); font-weight:600;}
+  details.notes summary::after{content:" (detalizētais slānis: skaitļi, metode, avoti)"; font-weight:400; color:var(--muted);}
+  details.notes p,details.notes li{font-size:14.5px; color:var(--ink-2);}
+  details.notes p{margin:8px 0 4px;} details.notes ul{margin:6px 0;}
+  .small{font-size:13px; color:var(--muted);}
+  .src{font-size:12.5px; color:var(--muted);}
+  /* Grafiki */
+  .chart{margin:14px 0 8px;}
+  .pz{background:var(--card); border:1px solid var(--grid); border-radius:10px; padding:10px 12px 8px;}
+  .pz-wrap{position:relative;}
+  .pz svg{width:100%; height:auto; display:block; font-family:var(--sans);}
+  .pz svg .grid{stroke:var(--grid); stroke-width:1;} .pz svg .axis{stroke:var(--ink-2); stroke-width:1;}
+  .pz svg .tick{font-size:11.5px; fill:var(--ink-2);} .pz svg .alab{font-size:12px; fill:var(--ink-2); font-weight:600;}
+  .pz svg .small{font-size:11px; fill:var(--ink-2);} .pz svg .elab{font-size:11.5px; font-weight:600;} .pz svg .rlab{font-size:11.5px; fill:var(--ink);}
+  .pz svg .ptitle{font-size:12.5px; font-weight:600; fill:var(--ink);} .pz svg .xhair{stroke:var(--ink); stroke-width:1; opacity:.5;}
+  .pz-tools{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:0 0 8px; font-size:12.5px;}
+  .pz-lab{color:var(--muted); font-family:var(--sans); font-size:12px; margin-right:2px;}
+  .pz-chip{font:inherit; font-size:12px; padding:3px 10px; border:1px solid var(--grid); border-radius:999px; background:var(--card); color:var(--ink-2); cursor:pointer;}
+  .pz-chip[aria-pressed="true"]{background:var(--s1); border-color:var(--s1); color:#fff;}
+  .pz-chip.pz-plus{border-style:dashed;} .pz-chip.pz-tbl{margin-left:auto;}
+  .pz-sel{font:inherit; font-size:12px; padding:3px 8px; border:1px solid var(--grid); border-radius:6px; background:var(--card); color:var(--ink);}
+  .pz-tip{position:absolute; pointer-events:none; background:var(--card); border:1px solid var(--grid); border-radius:8px; padding:8px 10px; font-size:12.5px; box-shadow:0 6px 20px rgba(0,0,0,.14); max-width:360px; z-index:5;}
+  .pz-tip div{display:flex; gap:7px; align-items:center; margin:2px 0;} .pz-tip i{display:inline-block; width:14px; height:3px; border-radius:2px; flex:none;} .pz-tip b{font-family:var(--sans); font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums;}
+  .pz-legend{display:flex; flex-wrap:wrap; gap:6px 16px; font-size:12.5px; color:var(--ink-2); margin:8px 0 2px;}
+  .pz-legend i{display:inline-block; width:18px; height:3px; border-radius:2px; margin-right:6px; vertical-align:middle;} .pz-legend i.ln{height:0; width:22px;} .pz-legend i.pt{width:10px; height:10px; border-radius:50%;}
+  .pz-table{margin-top:8px; max-height:360px; overflow:auto;} .pz-table table{font-size:12.5px; margin:0;}
+  .pz-note{font-size:12.5px; color:var(--muted); margin:8px 0 0;}
+  .pz-grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;} .pz-grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
+  @media (max-width:900px){.pz-grid2,.pz-grid3{grid-template-columns:1fr;}}
+  .pz-cell .pz{padding:6px 8px 4px;}
+  body.prez .wrap{max-width:1320px;}
+  body.prez section.s{min-height:calc(100vh - 44px); scroll-margin-top:44px; padding:36px 0 26px;}
+  body.prez nav.toc{display:none;}
+  body.prez details.notes:not([open]){display:none;}
+  body.notes details.notes{display:block;}
+  @media print{ .bar,.progress,nav.toc,.pz-tools,.kicker a.top{display:none;} section.s{page-break-before:always; border:none; padding:12px 0;} section.s:first-of-type{page-break-before:avoid;} details.notes{display:block;} details.notes summary{display:none;} body{font-size:12.5px;} .pz{page-break-inside:avoid;} }
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="bar">
+  <div class="t">Ieskats aktuālajos OECD, IEA, SPKC u. c. datos: ko varam prognozēt?</div>
+  <a class="btn" href="#toc" id="bTop" title="Saturs">Saturs</a>
+  <button id="bPrez" aria-pressed="false" title="Katra sadaļa aizņem ekrānu; bultiņas pārvieto, + pievieno nākamo grafika slāni">Prezentācijas režīms</button>
+  <button id="bNotes" aria-pressed="false" title="Atver detalizēto slāni visās sadaļās">Sīkāk visur</button>
+  <button id="bTheme" aria-pressed="false">Tumšs</button>
+  <div class="pos" id="pos"></div>
+</div>
+
+<nav class="toc" id="toc" aria-label="Sadaļas"></nav>
+
+<div class="wrap">
+
+<!-- 0 -->
+<section class="s" id="s00" data-title="Titullapa">
+  <p class="kicker">Ziņojums · 2026. gada 5. novembris</p>
+  <h1>Ko no OECD, IEA, SPKC un nacionālajiem datiem varēja pamanīt pirms PISA 2025, un ko tie ļauj prognozēt turpmāk?</h1>
+  <p class="lead">Pārbaudes gadījums ir tekstpratība: OECD to sauc par reading literacy, Latvijas PISA ziņojumos tā ir lasīšanas kompetence, PIRLS ziņojumos un šajā analīzē lasītprasme. Ziņojumā vērtēts, kādi signāli starptautiskajos un nacionālajos datos bija redzami pirms 2025. gada krituma, ko no tiem bija iespējams prognozēt un ko vēsturiskie dati ļauj pamatoti plānot līdz 2035. gadam.</p>
+  <div class="kpis">
+    <div class="kpi"><div class="v">9</div><div class="l">OECD PISA (Starptautiskās skolēnu novērtēšanas programmas) cikli ar Latvijas mikrodatiem, 2000 līdz 2025</div></div>
+    <div class="kpi"><div class="v">10</div><div class="l">IEA (Starptautiskās izglītības sasniegumu novērtēšanas asociācijas) mērījumi 4. un 8. klasē: PIRLS (lasītprasme), TIMSS (matemātika un dabaszinātnes), ICCS (pilsoniskā izglītība) un ICILS (datorpratība)</div></div>
+    <div class="kpi"><div class="v">6</div><div class="l">HBSC (Pasaules Veselības organizācijas Skolēnu veselības paradumu pētījums; Latvijā veic Slimību profilakses un kontroles centrs, SPKC) mērījumu kārtas, 2001/02 līdz 2021/22</div></div>
+    <div class="kpi"><div class="v">594 000</div><div class="l">VIAA (Valsts izglītības attīstības aģentūras) centralizēto eksāmenu kārtotāju datu rindas, 2011./12. līdz 2024./25.</div></div>
+  </div>
+  <p class="small">Edmunds Vanags. Neatkarīga datu analīze kopš 2026. gada augusta. Visi aprēķini ir atkārtojami, un skripti un dokumenti uzskaitīti pēdējā sadaļā. Ja nav norādīts citādi, rezultāti attiecas uz latviešu valodas plūsmu. Grafiki ir interaktīvi: datu slāņus var pievienot pakāpeniski, filtrus var mainīt, bet precīzās vērtības apskatīt tabulā.</p>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Kā lasīt šo lapu.</strong> Katra sadaļa attīsta vienu secinājumu. Pamatdaļā parādīti galvenie fakti un grafiks, bet sadaļā “Sīkāk” pievienoti skaitļi, metode un avoti. Grafikā “Slāņi” datus var pievienot pa vienam ar pogu “+ pievienot nākamo slāni”, “Tabula ar vērtībām” rāda visas vērtības, bet filtri ļauj mainīt jomu, skalu vai paaudzi. Precīzās vērtības redzamas, novietojot kursoru uz grafika.</p>
+    <p><strong>Terminoloģija.</strong> Šajā ziņojumā “tekstpratība” un “lasītprasme” apzīmē vienu un to pašu prasmes jomu, ko OECD sauc par reading literacy. Latvijas PISA nacionālajos ziņojumos (LU Izglītības pētniecības institūts) lietots termins “lasīšanas kompetence”, PIRLS ziņojumos “lasītprasme” (Starptautiskais lasītprasmes novērtēšanas pētījums), bet Skola2030 standartā un IZM dokumentos “tekstpratība”; šajā analīzē un tās dokumentos lietota “lasītprasme”. Valodu plūsmas dažādos datu avotos nav definētas identiski: PISA datos tās noteiktas pēc mājās lietotās valodas, bet IEA pētījumos pēc testa valodas. Atšķirība ir neliela: PISA datos definīcija pēc mājās lietotās valodas un pēc mācību programmas 2018. līdz 2025. gadā atšķiras ne vairāk kā par 1,2 punktiem, bet IEA pētījumos stingrākā definīcija (testa valoda un mājās runā testa valodā) dod par 3 līdz 6 punktiem augstāku līmeni; secinājumi no šīs izvēles nav atkarīgi. Krievu valodas plūsmas rezultātus papildus ietekmē pāreja uz mācībām latviešu valodā, tāpēc turpmākajā analīzē galvenā uzmanība pievērsta latviešu valodas plūsmai.</p>
+    <p><strong>Datu avoti.</strong> Analīzē izmantoti OECD (Ekonomiskās sadarbības un attīstības organizācijas) pētījumu dati: PISA (Starptautiskā skolēnu novērtēšanas programma) 2000 līdz 2025 mikrodati, TALIS (Starptautiskais mācīšanas un mācīšanās pētījums) 2013 līdz 2024 un PIAAC (Starptautiskā pieaugušo kompetenču novērtēšanas programma) 2023; IEA (Starptautiskās izglītības sasniegumu novērtēšanas asociācijas) pētījumu dati: PIRLS (lasītprasme 4. klasē), TIMSS (matemātika un dabaszinātnes 4. un 8. klasē), ICCS (pilsoniskā izglītība 8. klasē) un ICILS (datorpratība 8. klasē); PVO (Pasaules Veselības organizācijas) HBSC (Skolēnu veselības paradumu pētījuma) dati, ko Latvijā apkopo SPKC (Slimību profilakses un kontroles centrs), par 2001/02 līdz 2021/22; VIAA (Valsts izglītības attīstības aģentūras) centralizēto eksāmenu kārtotāju līmeņa faili un VISC (Valsts izglītības satura centra) diagnosticējošo darbu publiskie rezultāti. Visi saīsinājumi atšifrēti arī 22. sadaļā.</p>
+  </details>
+</section>
+
+<!-- 1 -->
+<section class="s" id="s01" data-title="Īsā atbilde">
+  <p class="kicker">1 · Īsā atbilde</p>
+  <h2>Krituma virzienu varēja paredzēt, bet ne tā apjomu. Par nākamo paaudzi signāli jau ir pieejami.</h2>
+  <ol>
+    <li><strong>2025. gada kritums nav izskaidrojams tikai ar mērījuma īpatnībām.</strong> Latviešu valodas plūsmas rezultāts pret 2022. gadu samazinājās par 19,4 punktiem. Lielākā krituma daļa sakrīt ar pārmaiņām salīdzinājuma valstīs, bet Latvijai specifiskā daļa ir aptuveni 5 punkti.</li>
+    <li><strong>Ilgtermiņa riska pazīmes datos bija redzamas jau aptuveni desmit gadus iepriekš.</strong> Tās ietvēra lasīšanas paradumu pasliktināšanos, grāmatu skaita samazināšanos mājās, augstāko sasniegumu grupas sarukumu un skolā lasīto tekstu neliela apjoma praksi: 2018. gadā tekstu, garāku par 100 lappusēm, stundās bija lasījis 21 % latviešu valodas plūsmas skolēnu pret 47 % salīdzinājuma valstīs, un Latvijā, atšķirībā no Igaunijas, nav noteikts minimālais gadā izlasāmo darbu skaits. Nacionālajos ziņojumos šīs pazīmes netika sistemātiski interpretētas kā agrīns brīdinājums.</li>
+    <li><strong>Modeļi labāk prognozē Latvijas relatīvo vietu nekā visām valstīm kopīgu kritumu.</strong> No PIRLS 2021 4. klases rezultātiem bija iespējams pareizi paredzēt PISA 2025 relatīvās pārmaiņas virzienu un aptuveno lielumu. Šie dati bija publiski pieejami kopš 2023. gada maija.</li>
+    <li><strong>Par nākamo paaudzi brīdinājuma signāli jau ir publiski pieejami.</strong> Tos sniedz PIRLS 2021, TIMSS 2023, 9. klases eksāmeni 2024./25. mācību gadā un TALIS 2024.</li>
+    <li><strong>Vēsturiskie dati ļauj noteikt ticamu pārmaiņu diapazonu un virzienu, nevis vienu precīzu mērķa vērtību.</strong> No Latvijas 2025. gada sākuma līmeņa neviens analīzē iekļautais vēsturiskais pārmaiņu ceļš līdz 2035. gadam nesasniedz 15 % skolēnu zem 2. kompetences līmeņa lasīšanā.</li>
+  </ol>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p>Šī sadaļa ir ziņojuma karte. 2. līdz 5. sadaļa skaidro, kas notika 2025. gadā un cik lielā mērā kritums saglabājas pēc metodiskām korekcijām. 6. līdz 9. sadaļa vērtē, kādi signāli bija redzami iepriekš un ko spēj prognožu modeļi. 10. līdz 13. sadaļa papildina ainu ar nacionālajiem, skolotāju, resursu un HBSC datiem. 14. līdz 17. sadaļa rāda vēsturiski novēroto pārmaiņu tempu un iespējamos scenārijus. 18. un 19. sadaļa apkopo secinājumus plānošanai un agrīnās brīdināšanas sistēmai. Atrunas dotas 20. sadaļā, avoti 21. sadaļā.</p>
+    <p>Galvenie skaitļi īsajā atbildē: 7 salīdzinājuma valstu vidējais kritums no 2022. līdz 2025. gadam bija 14,0 punkti, rēķinot visus skolēnus, bet latviešu valodas plūsmai Latvijā 19,4 punkti. Paaudžu modelis, izmantojot PIRLS datus, 2025. gadam prognozēja relatīvu pārmaiņu −4,3, bet faktiskā bija −4,7. PISA 2029 prognoze latviešu valodas plūsmai ir −4,4 (SE 3,0) attiecībā pret 7 salīdzinājuma valstīm.</p>
+  </details>
+</section>
+
+<!-- 2 -->
+<section class="s" id="s02" data-title="Datu avoti">
+  <p class="kicker">2 · Ko mērām, cik bieži un ar kādu nobīdi</p>
+  <h2>Vairāki starptautiskie un nacionālie datu avoti ļauj vienu paaudzi novērot dažādos vecumos</h2>
+  <p class="lead">Neviens datu avots viens pats neveido pilnvērtīgu agrīnās brīdināšanas sistēmu. Signāls kļūst informatīvāks, ja mērījumus savieno pēc dzimšanas gada un vienu paaudzi novēro 4., 6., 8. un 9. klasē, 15 gadu vecumā un vēlāk pieaugušo pētījumos.</p>
+  <table>
+    <thead><tr><th>Avots</th><th>Vecums vai klase</th><th>Cikli ar Latviju</th><th>Biežums</th><th>Laiks no mērījuma līdz datu publicēšanai</th><th>Nākamais</th></tr></thead>
+    <tbody>
+      <tr><td>OECD PISA (Ekonomiskās sadarbības un attīstības organizācijas Starptautiskā skolēnu novērtēšanas programma, Programme for International Student Assessment)</td><td>15 gadi</td><td>2000 līdz 2025, 9 cikli, mikrodati visiem</td><td>reizi 3 līdz 4 gados</td><td>17 līdz 20 mēneši</td><td>PISA 2029, rezultāti 2030. gada beigās</td></tr>
+      <tr><td>IEA PIRLS (Starptautiskās izglītības sasniegumu novērtēšanas asociācijas Starptautiskais lasītprasmes novērtēšanas pētījums, Progress in International Reading Literacy Study)</td><td>4. klase</td><td>2001, 2006, 2016, 2021</td><td>reizi 5 gados</td><td>ap 19 mēneši</td><td>PIRLS 2026</td></tr>
+      <tr><td>IEA TIMSS (Starptautiskais matemātikas un dabaszinātņu izglītības attīstības tendenču pētījums, Trends in International Mathematics and Science Study)</td><td>4. un 8. klase</td><td>2003, 2007, 2019, 2023</td><td>reizi 4 gados</td><td>ap 20 mēneši</td><td>TIMSS 2027</td></tr>
+      <tr><td>IEA ICCS (Starptautiskais pilsoniskās izglītības pētījums, International Civic and Citizenship Education Study) un ICILS (Starptautiskais datorpratības un informācijpratības pētījums, International Computer and Information Literacy Study)</td><td>8. klase</td><td>ICCS 2009, 2016, 2022; ICILS 2023</td><td>reizi 6 līdz 7 gados</td><td>ap 18 mēneši</td><td>ICILS 2028</td></tr>
+      <tr><td>OECD PIAAC (Starptautiskā pieaugušo kompetenču novērtēšanas programma, Programme for the International Assessment of Adult Competencies)</td><td>16 līdz 65 gadi</td><td>2023</td><td>reizi 10 gados</td><td>ap 20 mēneši</td><td>plānots 2030. gadu sākumā</td></tr>
+      <tr><td>OECD TALIS (Starptautiskais mācīšanas un mācīšanās pētījums, Teaching and Learning International Survey): skolotāju un direktoru aptauja</td><td>pamatskolas 7. līdz 9. klases (ISCED 2) skolotāji un direktori</td><td>2008, 2013, 2018, 2024</td><td>reizi 5 līdz 6 gados</td><td>ap 18 mēneši</td><td>ap 2030. gadu</td></tr>
+      <tr><td>PVO HBSC (Pasaules Veselības organizācijas Skolēnu veselības paradumu pētījums, Health Behaviour in School-aged Children); Latvijā to veic SPKC (Slimību profilakses un kontroles centrs)</td><td>11, 13, 15 gadi</td><td>2001/02 līdz 2021/22, 6 kārtas</td><td>reizi 4 gados</td><td>pārlūks ap 2 gadiem; mikrodatiem 4 gadu embargo</td><td>2025/26, datu vākšana notiek</td></tr>
+      <tr><td>VIAA (Valsts izglītības attīstības aģentūra): centralizētie eksāmeni</td><td>9. un 12. klase</td><td>kārtotāju līmeņa faili, 2011./12. līdz 2024./25.</td><td>katru gadu, pilna populācija</td><td>ap 3 mēneši</td><td>2025./26.</td></tr>
+      <tr><td>VISC (Valsts izglītības satura centrs, līdz 2024. gadam): diagnosticējošie darbi</td><td>3. un 6. klase</td><td>2009./10. līdz 2021./22. (publiski tikai grafiki)</td><td>katru gadu, pilna populācija</td><td>ap 3 mēneši</td><td>skolu līmeņa dati nav publiski pieejami</td></tr>
+    </tbody>
+  </table>
+  <div class="box"><p><strong>Laika nobīdes nosaka, cik agri datus var izmantot lēmumiem.</strong> Starptautisko pētījumu rezultāti parasti kļūst pieejami aptuveni pusotru gadu pēc mērījuma, bet Latvijas nacionālais ziņojums var sekot vēlāk. Nacionālie pārbaudes darbi dod ikgadēju un pilnas populācijas skatījumu, taču pašlaik tiem nav psihometriski saskaņotas skalas starp gadiem.</p></div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p>PISA mikrodati ir pieejami visiem cikliem no 2000. līdz 2025. gadam, tostarp par 2000. līdz 2012. gadu, kas iepriekš bija pieejami pēc OECD pieprasījuma. Tas ļauj valodu plūsmas analizēt visā periodā. IEA dati dod iespēju to pašu paaudzi novērot jau 4. klasē, aptuveni 5 līdz 6 gadus pirms PISA. HBSC papildina ainu ar labbūtības un skolas vides rādītājiem 11 un 13 gadu vecumā. VIAA eksāmenu faili nodrošina ikgadēju pilnas populācijas mērījumu: 123 datu faili un 594 tūkstoši kārtotāju ierakstu ar informāciju par skolu, skolas tipu un urbanizāciju.</p>
+    <p>Publicēšanas nobīdes piemēri. PIRLS 2016 mērījums notika 2016. gada aprīlī, bet nacionālais ziņojums publicēts 2017. gada 21. novembrī, pēc 19 mēnešiem. PIRLS 2021 mērījums notika 2021. gada oktobrī, ziņojums publicēts 2023. gada 7. maijā, pēc 18 mēnešiem. PISA 2022 mērījums notika 2022. gada aprīlī, pirmie rezultāti publicēti 2023. gada 1. decembrī, pēc 20 mēnešiem. PISA 2025 tests Latvijā notika no 2025. gada marta līdz maijam, mikrodati publicēti 2026. gada 8. septembrī.</p>
+  </details>
+</section>
+
+<!-- 3 -->
+<section class="s" id="s03" data-title="Divi stāsti">
+  <p class="kicker">3 · Viena valsts, divi stāsti</p>
+  <h2>2025. gada valsts vidējais apvieno divus atšķirīgus procesus</h2>
+  <p class="lead">Krievu valodas plūsmas 2025. gada rezultātu ietekmē gan testa valodas maiņa, gan iespējamas prasmes pārmaiņas, un šos efektus pilnībā nošķirt nav vienkārši. Latviešu valodas plūsmas kritumam ir cita dinamika. Tāpēc turpmākā analīze, ja nav norādīts citādi, attiecas uz latviešu valodas plūsmu.</p>
+  <table>
+    <thead><tr><th>PISA lasīšana</th><th class="n">2018</th><th class="n">2022</th><th class="n">2025</th><th class="n">2022 → 2025</th><th class="n">Zem 2. līmeņa 2025</th></tr></thead>
+    <tbody>
+      <tr><td>Latviešu valodas plūsma</td><td class="n">486,6</td><td class="n">478,5</td><td class="n">459,2</td><td class="n">−19,4</td><td class="n">28,5 %</td></tr>
+      <tr><td>Krievu valodas plūsma</td><td class="n">468,3</td><td class="n">473,4</td><td class="n">376,1</td><td class="n">−97,3</td><td class="n">65,1 %</td></tr>
+      <tr><td>Visa Latvija, OECD publicētais rādītājs</td><td class="n">478,1</td><td class="n">474,9</td><td class="n">429,7</td><td class="n">−45,2</td><td class="n">41,3 %</td></tr>
+      <tr><td>7 salīdzinājuma valstu vidējais, visi skolēni</td><td class="n">499,5</td><td class="n">486,1</td><td class="n">472,2</td><td class="n">−14,0</td><td class="n"></td></tr>
+    </tbody>
+  </table>
+  <div class="box bad"><p>Visas Latvijas rezultāts no 2022. līdz 2025. gadam samazinājās par 45,2 punktiem, kas ir otrs lielākais kritums starp 74 valstīm. Lielu daļu no tā veido krievu valodas plūsmas pārmaiņa. Tāpēc valsts vidējais vien nepietiek, lai plānotu turpmāko rīcību. PISA 2029 populācijas sastāvs pēc mācību valodas būs citāds, jo visi dalībnieki mācīsies latviešu valodā.</p></div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p>OECD publicētais Latvijas kritums ir 45,2 punkti. Aptuveni divas trešdaļas no šīs pārmaiņas saistītas ar krievu valodas plūsmu, kurai 2025. gadā mainījās testa valoda: 2022. gadā 77,4 % šīs plūsmas skolēnu testu pildīja krieviski un 22,6 % latviski, bet 2025. gadā visi pildīja latviski. Latviski testētie krievu valodas plūsmas skolēni 2015. līdz 2022. gadā bija par 34 līdz 39 punktiem vājāki arī pie vienāda sociālā fona; tā ir testa valodas un atlases kopīga ietekme, ko datos nošķirt nevar. Tas nav pamats šo daļu uzskatīt par mērījuma kļūdu, bet tas nozīmē, ka tajā apvienojas atšķirīgi procesi. Latviešu valodas plūsmas kritums ir 19,4 punkti, un tieši šo rindu var salīdzināt ar Latvijas iepriekšējiem cikliem un ar salīdzinājuma valstīm.</p>
+    <p>Salīdzinājumam izmantotas 7 valstis: Igaunija, Lietuva, Polija, Somija, Čehija, Ungārija un Vācija. Vidējie aprēķināti no OECD publicētajiem valstu rezultātiem. No 2022. līdz 2025. gadam pārmaiņas bija: Čehijā −19,6, Ungārijā −20,3, Somijā −17,0, Vācijā −13,7, Igaunijā −12,6, Lietuvā −7,5 un Polijā −7,1 punkts. Krievu valodas plūsmā skolēnu īpatsvars zem 2. kompetences līmeņa 2022. gadā bija 23,6 %. Pēc 2029. gada valodu plūsmu salīdzināšanai būs jāizmanto mājās lietotā valoda, nevis testa valoda.</p>
+  </details>
+</section>
+
+<!-- 4 -->
+<section class="s" id="s04" data-title="2025: cik reāls">
+  <p class="kicker">4 · 2025. gads: cik liels un cik reāls</p>
+  <h2>Latviešu valodas plūsmas kritums sākas pirms 2025. gada un saglabājas arī pēc metodiskām korekcijām</h2>
+  <p class="lead">Koriģētajā rindā 2018. gads ir augstākais punkts, un pēc tā rezultāts samazinās abos nākamajos ciklos: no 2018. līdz 2022. gadam par 8,1 punktu (statistiski nozīmīgi), no 2022. līdz 2025. gadam par 17,5 punktiem. Pirmo kritumu tātad izmērīja 2022. gada cikls, un tas kļuva redzams, kad 2022. gada rezultāti tika publicēti 2023. gada decembrī; vidējā rezultāta kritums ir sekas daudz agrākām izmaiņām lasīšanas paradumos, mājas lasīšanas vidē un augšgala sniegumā, kas datos parādās kopš 2000. gada. Šī sadaļa atbild uz jautājumu, cik liels un cik drošs ir pats kritums; 5. sadaļa pārbauda, cik no tā varēja paredzēt ar vidējā rezultāta rindu, bet 6. līdz 9. sadaļa parāda agrākos signālus citos mērījumos un paaudzēs.</p>
+  <div class="kpis">
+    <div class="kpi bad"><div class="v">−17,5</div><div class="l">2022 → 2025 pēc iesaistes korekcijas; oficiāli −19,4</div></div>
+    <div class="kpi bad"><div class="v">−25,6</div><div class="l">2018 → 2025 pēc korekcijām, 496,2 → 470,6</div></div>
+    <div class="kpi"><div class="v">0,86 līdz 0,88</div><div class="l">Testa rezultātu ticamības koeficients 2025. gadā, mērījuma iekšējā ticamība ir stabila</div></div>
+    <div class="kpi warn"><div class="v">ap 5</div><div class="l">aptuvenā Latvijai specifiskā daļa 2022 → 2025 pret 7 salīdzinājuma valstīm</div></div>
+  </div>
+  <p><strong>Ko nozīmē metodiskās korekcijas.</strong> Oficiālo rindu salīdzināšanai ar laiku pirms 2018. gada papildina divas korekcijas. Pirmā: 2018. gadā PISA lasīšanas testu Latvijā pirmo reizi pildīja adaptīvā formā, un uz kopīgajiem uzdevumiem noteikts, ka tas latviešu valodas plūsmas rezultātu pazemināja par aptuveni 9,6 punktiem; koriģētā rinda šo nobīdi pieskaita visiem cikliem no 2018. gada. Otrā: 2025. gadā daļa skolēnu uz uzdevumiem atbildēja tik ātri, ka tekstu izlasīt nevarēja; šādu atbilžu ietekme uz vidējo ir aptuveni 1,9 punkti, un tā pieskaitīta 2025. gada rezultātam. Abas korekcijas ir noteiktas datos ar standartkļūdām; neapstrādātā rinda ir OECD publicētā.</p>
+  <div class="chart" data-chart="korigeta"></div>
+  <ul>
+    <li>Kritums redzams visā rezultātu sadalījumā: 10. procentile (P10, vājāko skolēnu robeža) samazinājusies par 25,8 punktiem, 90. procentile (P90, spēcīgāko skolēnu robeža) par 15,8 punktiem, bet skolēnu īpatsvars zem 2. kompetences līmeņa no 2022. līdz 2025. gadam pieaudzis par 7,2 procentpunktiem.</li>
+    <li>No 2018. līdz 2025. gadam latviešu valodas plūsmas kritums bija gandrīz tāds pats kā 7 salīdzinājuma valstu vidējais kritums, attiecīgi −27,4 un −27,3 punkti. No tā var secināt, ka liela daļa pārmaiņas nav unikāla Latvijai, lai gan Latvijā samazināšanās sākās jau pēc 2018. gada cikla.</li>
+  </ul>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Trīs skaidrojumi, kas datos neizskaidro visu kritumu.</strong> Pirmkārt, mērījuma instrumenta problēma: PV ticamība ir 0,86 līdz 0,88, stratificētā alfa 0,88, bet DIF rezultāti ir līdzsvaroti; uzdevumu līmeņa analīze neparāda, ka 2025. gada kritumu kopumā izraisītu testa formāts. Otrkārt, zemāka skolēnu iesaiste: ātrās minēšanas un iesaistes korekcija palielina rezultātu aptuveni par 1,9 punktiem, ar iespējamo robežu no 0 līdz 9 punktiem, tāpēc tā neizskaidro 19 punktu kritumu. Treškārt, tikai Latvijai raksturīga problēma: 7 salīdzinājuma valstīs vidējais kritums bija 14 punkti, bet 74 valstu mediāna −10,9.</p>
+    <p><strong>Koriģētā rinda.</strong> Oficiālajai rindai no 2018. gada piemērota adaptīvā testa instrumenta nobīdes korekcija +9,6 punkti (SE 2,0), kas noteikta uzdevumu līmenī no publiskajiem 2015. un 2018. gada datiem, bet 2025. gadam papildus piemērota iesaistes korekcija +1,9 punkti. Koriģētie rezultāti ir 489,4 2015. gadā, 496,2 2018. gadā, 488,1 2022. gadā un 470,6 2025. gadā (SE attiecīgi 2,1; 2,8; 3,2; 3,6). Pārmaiņas: 2015 → 2018 +6,9 (SE 5,3), 2018 → 2022 −8,1 (3,5), 2022 → 2025 −17,5 (4,1), 2018 → 2025 −25,6 (4,0), 2003 → 2025 −28,5 (7,8). Saites kļūdas ņemtas no OECD PISA 2025 I sējuma.</p>
+    <p><strong>Latvijai specifiskā daļa.</strong> Salīdzinot ar 7 valstu visu skolēnu vidējo, Latvijas relatīvā pārmaiņa no 2022. līdz 2025. gadam pēc korekcijām ir −3,5 punkti (SE 4,5), bet nekoriģētā rinda dod −5,4. Salīdzinot galvenās mājas valodas plūsmas, attiecīgās vērtības ir −6,3 (SE 4,4) un −8,2 punkti. Neviena no šīm relatīvajām atšķirībām nav statistiski nozīmīga. Augstāko sasniegumu grupā, 5. un 6. kompetences līmenī, 2025. gadā ir 2,7 % skolēnu, tikpat maz kā 2009. gadā.</p>
+  </details>
+</section>
+
+<!-- 5 -->
+<section class="s" id="s05" data-title="Ex ante: no rindas">
+  <p class="kicker">5 · Vai 2025. gadu varēja paredzēt no Latvijas pašas rindas</p>
+  <h2>Ko par 2025. gadu varēja paredzēt ar katru datu veidu, izmantojot tikai pirms testa publicētos datus</h2>
+  <p class="lead">Katrs datu veids atbild uz citu jautājumu, tāpēc tie pārbaudīti atsevišķi, katrs tikai ar datiem, kas bija publicēti pirms PISA 2025 testa (2025. gada marts). Vidējā rezultāta rinda ļauj paredzēt virzienu, tās pašas paaudzes agrāks mērījums 4. klasē relatīvo pārmaiņu, anketu rādītāji Latvijai specifisko daļu, bet ilgtermiņa priekšnosacījumi, kas veidojas gadiem pirms rezultāta (lasīšanas paradumi, grāmatas mājās, skolā lasīto tekstu apjoms), ļauj redzēt virzienu ar desmit gadu horizontu. Neviens no tiem neļauj paredzēt visām valstīm kopīgā krituma apjomu. Kopā tie saskan ar ziņojuma galveno secinājumu: 2025. gada lasītprasmes kritums ir sekas daudz agrākām izmaiņām, un vidējā rezultāta rinda tās uzrāda pēdējā.</p>
+  <table>
+    <thead><tr><th>Datu veids</th><th>Kas bija publicēts pirms testa</th><th>Ko varēja paredzēt</th><th>Kas palika neparedzēts</th></tr></thead>
+    <tbody>
+      <tr><td>Vidējā rezultāta rinda (PISA 2003 līdz 2022)</td><td>PISA 2022 rezultāti, 2023. gada decembris</td><td>Virzienu: trīs no četriem iepriekš fiksētiem modeļiem prognozēja stagnāciju vai kritumu; zem 2. līmeņa daļas pieaugumu</td><td>Apjomu: prognoze vidēji 477 punkti, faktiski 459,2</td></tr>
+      <tr><td>Tās pašas paaudzes agrāks mērījums 4. klasē (PIRLS 2021)</td><td>PIRLS 2021 rezultāti, 2023. gada maijs</td><td>Relatīvo pārmaiņu pret 7 salīdzinājuma valstīm: paaudžu modelis prognozēja −4,3, faktiski −4,7</td><td>Starp valstīm tas pats signāls nedarbojas; Latvijai tie ir 7 notikumi</td></tr>
+      <tr><td>Skolēnu un skolu anketu rādītāji (PISA 2000 līdz 2022)</td><td>anketu dati līdz 2022. gada ciklam</td><td>Latvijai specifisko daļu: aptuveni −7,5 punkti ar nenoteiktību ± 2,8</td><td>Visām valstīm kopīgo kritumu; aplēse atkarīga no divu 2025. gada rādītāju salīdzināmības</td></tr>
+      <tr><td>Ilgtermiņa priekšnosacījumi: lasīšanas paradumi, grāmatas mājās, augstāko sasniegumu grupas lielums (2000 līdz 2018)</td><td>publicēti ar katru ciklu kopš 2000. gada</td><td>Ilgtermiņa virzienu ar aptuveni desmit gadu horizontu (7. un 8. sadaļa)</td><td>Konkrēta cikla apjomu</td></tr>
+      <tr><td>Visām salīdzinājuma valstīm kopīgais kritums (2022 → 2025 vidēji −14 punkti)</td><td></td><td>Nevarēja paredzēt neviens no datu veidiem</td><td>Tā ir lielākā 2025. gada krituma daļa</td></tr>
+    </tbody>
+  </table>
+  <h3>Vidējā rezultāta rindas turpinājums: pārbaude ar iepriekš fiksētiem modeļiem</h3>
+  <table>
+    <thead><tr><th>Prognozes brīdis</th><th>Kas bija publicēts</th><th class="n">Prognoze 2025 (4 modeļi)</th><th class="n">Vidēji</th><th class="n">Faktiski</th><th>Interpretācija</th></tr></thead>
+    <tbody>
+      <tr><td>2020. gada decembris</td><td>PISA 2018, TIMSS 2019</td><td class="n">480 līdz 491</td><td class="n">486</td><td class="n">459,2</td><td>faktiskais rezultāts 90 % intervālā, tuvu apakšējai robežai</td></tr>
+      <tr><td>2023. gada decembris</td><td>PISA 2022, PIRLS 2021</td><td class="n">472 līdz 483</td><td class="n">477</td><td class="n">459,2</td><td>90 % prognozes intervāls 447 līdz 492</td></tr>
+      <tr><td>2023. gada decembris, skolēni zem 2. līmeņa</td><td>tie paši dati</td><td class="n">20 līdz 23 %</td><td class="n"></td><td class="n">28,5 %</td><td>pieauguma virziens prognozējams, 2025. gada apjoms ne</td></tr>
+    </tbody>
+  </table>
+  <div class="box"><p>Starptautiskajā kalibrācijā tikpat liela vai lielāka prognozes kļūda sastopama aptuveni 14 līdz 29 % gadījumu. Tātad 2025. gada rezultāts bija negaidīti zems, bet ne ārpus modeļu iespējamā diapazona. Būtiskākais ierobežojums ir tas, ka visām valstīm kopīgu kritumu no vienas valsts iepriekšējās rindas paredzēt nevar. Tāpēc vidējā rezultāta rinda viena pati nav pietiekams agrīnās brīdināšanas instruments; nākamās sadaļas parāda, ko dod paaudžu un simptomu mērījumi.</p></div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Metode.</strong> Izmantoti četri iepriekš fiksēti modeļi: pēdējās vērtības modelis, lineārs trends no 2006. gada, trends pēdējos trīs ciklos un pēdējās pārmaiņas turpinājums. Prognožu intervāli kalibrēti starptautiski, izmantojot visu valstu lasīšanas vidējos un viena vai divu ciklu prognozes mērķa cikliem no 2015. līdz 2022. gadam. Analizēta gan oficiālā rinda, gan koriģētā “informētā analītiķa” rinda ar 2018. gada instrumenta nobīdes korekciju; prognoze beigās pārrēķināta atpakaļ uz oficiālo skalu.</p>
+    <p><strong>Rezultāti.</strong> Ar 2023. gada decembrī pieejamajiem datiem trīs modeļi prognozēja 2025. gada rezultātu robežās no 472,5 līdz 478,5 punktiem, kas atbilst stagnācijai vai nelielam kritumam. Lineārais trends no 2006. gada deva 482,7 punktus, jo 2006. līdz 2015. gada rinda bija augoša. Prognozes kļūda bija no −13 līdz −24 punktiem; ar 2020. gada decembrī pieejamajiem datiem no −21 līdz −32. Faktiskais rezultāts atrodas visu modeļu 90 % prognozes intervālā. Naivajam modelim 2020. gada prognozē tas atrodas pie 10. procentiles. No 2022. līdz 2025. gadam 74 valstu lasīšanas rezultātu pārmaiņas mediāna bija −10,9 punkti, OECD valstu mediāna −13,6. Avots: docs/60, R/pisa2025/63.</p>
+  </details>
+</section>
+
+<!-- 6 -->
+<section class="s" id="s06" data-title="Paaudžu skats">
+  <p class="kicker">6 · Paaudžu skats</p>
+  <h2>Vienu paaudzi var novērot vairākos vecumos, tāpēc daļa signālu ir redzama pirms PISA 15 gadu vecumā</h2>
+  <div class="chart" data-chart="lexis"></div>
+  <ul>
+    <li><strong>PISA 2025 paaudzei, kas dzimusi 2009. gadā,</strong> ICCS 2022 rezultāts 8. klasē bija zem salīdzinājuma valstu līmeņa. Blakus paaudzei, kas dzimusi 2011. gadā, PIRLS 2021 lasīšanas rezultāts bija par 30 punktiem zemāks nekā 2016. gadā.</li>
+    <li><strong>Analizētajās paaudzēs relatīvā pozīcija starp 4. un 9. klasi pasliktinās.</strong> Šāda tendence redzama arī pirms 2025. gada, tāpēc to nevar skaidrot tikai ar pēdējo PISA ciklu.</li>
+    <li><strong>Svarīgs ir arī ziņojumu publicēšanas laiks.</strong> Kad PISA 2025 paaudze bija sākumskolas vecumā, publiskajos ziņojumos dominēja formulējumi “ievērojami uzlabojušies” un “kopumā labi, stabils”. Izteikts brīdinājums parādījās vēlāk, kad šī paaudze jau bija 8. klasē.</li>
+  </ul>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Kā lasīt diagrammu.</strong> Horizontālā ass rāda mērījuma gadu, vertikālā ass skolēnu vecumu mērījuma brīdī: 4. klase ap 10,5 gadiem, 8. klase ap 14,3, PISA 15,8 gadi, PIAAC pieaugušie pa vecuma grupām 2023. gadā. Vienas paaudzes mērījumi tāpēc atrodas uz slīpas līnijas, kas iet no 4. klases pa labi uz augšu; šīs līnijas diagrammā ir ievilktas, un pie katra PISA punkta norādīts dzimšanas gads. Ziņojumu datumi ir vertikālas līnijas. Krāsa rāda novirzi no 7 salīdzinājuma valstu vidējā skolēnu standartnovirzes vienībās. Slānis “ziņojumu datumi” parāda, kad publicēti attiecīgie nacionālie vērtējumi.</p>
+    <p><strong>PISA 2025 paaudze.</strong> 4. klasē TIMSS 2019 matemātikas rezultāts bija tuvu salīdzinājuma valstu vidējam, bet relatīvi zemāks nekā iepriekšējām paaudzēm (z −0,22 pret +0,06 un +0,01 fiksētā 12 valstu kopā); diagrammā šis punkts nav rādīts, jo tas nav lasītprasmes mērījums. Lasīšanu 2019. gadā nemērīja, un Latvija nepiedalījās PIRLS 2011, tāpēc šai paaudzei nav tieša agrīna lasīšanas mērījuma. 8. klasē ICCS 2022 Latvijas rezultāts bija zem salīdzinājuma valstu vidējā (−25,2 punkti, z −0,62), līdzīgi kā citos ICCS ciklos; ICILS 2023 datorpratībā Latvija atradās salīdzinājuma valstu vidusdaļā. Relatīvās vietas pārmaiņa starp 4. un 9. klasi ir Δz no −0,23 līdz −0,49 lasīšanā un no −0,24 līdz −1,12 matemātikā, izmantojot fiksētu 14 vai 12 valstu kopu.</p>
+    <p><strong>Ziņojumu datumi.</strong> 2007. gada novembrī PIRLS 2006 monogrāfijā izmantots formulējums “nopietns brīdinājums” par statistiski nenozīmīgu −4 punktu pārmaiņu. 2017. gada novembrī PIRLS 2016 nacionālajā ziņojumā secināts “ievērojami uzlabojušies”. 2019. gada decembrī PISA 2018 pirmie rezultāti raksturoti kā “kopumā labi, stabils”. 2023. gada maijā PIRLS 2021 nacionālajā ziņojumā lietots formulējums “drauds visas izglītības sistēmas sniegumam”. 2023. gada decembrī PISA 2022 pirmie rezultāti raksturoti kā “labi un stabili”, bet PISA 2018 sekundārajā analīzē secināts, ka rezultāti “samazinājušies katrā pētījuma ciklā”. Avots: docs/41, 42, 61, 63.</p>
+  </details>
+</section>
+
+<!-- 7 -->
+<section class="s" id="s07" data-title="Signāli un ziņojumi">
+  <p class="kicker">7 · Signāli krājas, ziņojumi paliek nemainīgi</p>
+  <h2>Daļa ilgtermiņa riska pazīmju datos bija redzama vairākus gadus pirms 2025. gada krituma</h2>
+  <div class="kpis">
+    <div class="kpi bad"><div class="v">17,9 → 33,7 %</div><div class="l">skolēni, kuri nelasa prieka pēc, visa Latvija, 2000 → 2018</div></div>
+    <div class="kpi bad"><div class="v">34,3 → 14,2 %</div><div class="l">skolēni ar vairāk nekā 200 grāmatām mājās, 2003 → 2025</div></div>
+    <div class="kpi bad"><div class="v">7,2 → 2,7 %</div><div class="l">5. un 6. kompetences līmenis, 2003 → 2009; 95. procentiles (P95, augšgala) pārmaiņa 2003 → 2012 ir −19,9</div></div>
+    <div class="kpi warn"><div class="v">18 līdz 20 mēn.</div><div class="l">laiks no mērījuma līdz nacionālā ziņojuma publicēšanai</div></div>
+    <div class="kpi bad"><div class="v">21 pret 47 %</div><div class="l">skolēni, kuriem stundās bija jālasa par 100 lappusēm garāks teksts: Latvija un 7 salīdzinājuma valstis, PISA 2018</div></div>
+  </div>
+  <div class="chart" data-chart="panelis"></div>
+  <p>Lasīšanas paradumu un mājas grāmatu rādītāji pasliktinājās agrāk nekā vidējais PISA rezultāts, bet augstāko sasniegumu grupa saruka vēl pirms vidējā rezultāta. Tajā pašā laikā 2017. un 2019. gada nacionālajos ziņojumos kopējais vērtējums bija drīzāk stabils vai pozitīvs. Tas sakrita ar periodu, kad PISA 2025 paaudze bija sākumskolas vecumā.</p>
+  <h3>Cik garus tekstus skolā liek lasīt</h3>
+  <div class="chart" data-chart="garie"></div>
+  <p>Latvijā nav valsts noteikta minimuma, cik veselu darbu gadā jāizlasa; Igaunijā pamatskolas programma prasa vismaz četrus katrā klasē. Starpība ir redzama skolēnu atbildēs: Latvijā visbiežāk garākais teksts ir 2 līdz 50 lappuses, Igaunijā un Somijā 101 līdz 500.</p>
+  <h3>Politikas lēmumi pretī rezultātiem: Latvija, Igaunija, Somija</h3>
+  <div class="chart" data-chart="politika"></div>
+  <p>Grafiks saliek trīs valstu PISA lasīšanas rindas ar galvenajiem izglītības politikas notikumiem; notikumu slāņus var ieslēgt pa valstīm. Tas ļauj redzēt lēmumu laiku pret rezultātu pārmaiņām, bet ne cēloņsakarību: lēmuma ietekme parādās pēc gadiem un tikai tajās paaudzēs, kas tobrīd bija skolā.</p>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Ko rāda panelis.</strong> Deviņi rādītāji pārrēķināti efekta lielumos pret pirmo pieejamo mērījumu: PISA vidējais, P95 augšgals, 5. un 6. kompetences līmenis, skolēnu īpatsvars zem 2. līmeņa, grāmatas mājās, lasīšana prieka pēc, PIRLS 4. klases rezultāts, PIAAC pieaugušo rezultāti pa paaudzēm un viens PISA 2018 punkts par garu tekstu lasīšanu skolā. Pēdējā rādītāja vērtība ir 21,5 % Latvijā un 47,4 % 7 salīdzinājuma valstīs. Pelēkā josla ±0,20 SD atbilst Kraft (2020) izmantotajai robežai lielam efektam izglītības intervencēs.</p>
+    <p><strong>Skaitļi.</strong> To skolēnu īpatsvars, kuri nelasa prieka pēc, visā Latvijā pieauga no 17,9 % 2000. gadā līdz 29,7 % 2009. gadā un 33,7 % 2018. gadā; latviešu valodas plūsmā tas mainījās no 32,2 % līdz 37,8 %. Skolēnu īpatsvars ar vairāk nekā 200 grāmatām mājās latviešu valodas plūsmā samazinājās no 34,3 % 2003. gadā līdz 19,2 % 2018. gadā un 14,2 % 2025. gadā. 5. un 6. kompetences līmeņa īpatsvars samazinājās no 7,2 % 2003. gadā līdz 2,7 % 2009. gadā. P95 no 2003. līdz 2012. gadam samazinājās par 19,9 punktiem, kamēr vidējais rezultāts no 2006. līdz 2015. gadam statistiski nozīmīgi nemainījās. PIAAC 2023 datos latviešu valodas plūsmas paaudžu rezultāts ir par 0,15 līdz 0,27 SD zemāks nekā 7 salīdzinājuma valstīs visās vecuma grupās.</p>
+    <table><thead><tr><th>Publicēts</th><th>Dokuments</th><th>Ziņojuma formulējums</th></tr></thead><tbody>
+      <tr><td>2007-11</td><td>PIRLS 2006 monogrāfija</td><td>“nopietns brīdinājums” pie −4 punktu pārmaiņas, kas nav statistiski nozīmīga</td></tr>
+      <tr><td>2017-11</td><td>PIRLS 2016 nacionālais ziņojums</td><td>"ievērojami uzlabojušies"</td></tr>
+      <tr><td>2019-12</td><td>PISA 2018 pirmie rezultāti</td><td>“kopumā labi”, “stabils”</td></tr>
+      <tr class="bad"><td>2023-05-07</td><td>PIRLS 2021 nacionālais ziņojums</td><td>"drauds visas izglītības sistēmas sniegumam"</td></tr>
+      <tr><td>2023-12-01</td><td>PISA 2022 pirmie rezultāti</td><td>“labi un stabili”</td></tr>
+      <tr class="bad"><td>2023-12-31</td><td>PISA 2018 sekundārie pētījumi</td><td>"samazinājušies katrā pētījuma ciklā"</td></tr>
+    </tbody></table>
+    <p><strong>Garu tekstu lasīšana skolā.</strong> PISA 2018 skolēnu anketā jautāja, cik lappušu garš bija garākais teksts, kas šajā mācību gadā bija jālasa dzimtās valodas stundās. Latviešu valodas plūsmā tekstu, garāku par 100 lappusēm, lasīja 21 % skolēnu, krievu valodas plūsmā 32 %, 7 salīdzinājuma valstīs 47 % (Igaunijā 51 %, Somijā 74 %, OECD vidēji 43 %). Latvijā visbiežākā atbilde ir 2 līdz 50 lappuses (58 %), 7 valstīs 101 līdz 500 lappuses (43 %). Skolās, kur garie teksti ir biežāki, lasīšana ir augstāka arī pēc sociālā fona kontroles, bet Latvijā šī sakarība ir vājāka nekā citur, jo gara teksta lasīšana ir reta prakse, kas skolēnus nešķir. Jautājums uzdots tikai 2018. gadā, tāpēc tendenci datos redzēt nevar. LU sekundāro pētījumu ziņojumā (2023. gada decembrī) atradums ir ar secinājumu par ciešu saistību ar sasniegumiem, bet bez ieteikuma.</p>
+    <p>Avots: docs/41, 45, 58, 63; R/pisa2025/70.</p>
+    <p>Avoti: Riigi Teataja, Põhikooli riiklik õppekava, Lisa 1 "Keel ja kirjandus" (VV määrus nr 18, 2023); Skola2030, "Literatūra skolā: laikmetīgi darbi, skolotājiem lielāka brīvība autoru un tekstu izvēlē"; LSM 2026-08-11, "Kā vasarā bez obligātās literatūras saraksta veicināt skolēnus pievērsties grāmatām"; TV3 "Vai jēdziens obligātā literatūra vēl eksistē"; PISA 2018 ST154Q01HA (docs/58 papildinājums); LU IPI 2023-12-31, 91. lpp.</p>
+    <p><strong>Garu tekstu lasīšana skolā.</strong> PISA 2018 skolēnu anketā jautāja par garāko tekstu, kas attiecīgajā mācību gadā bija jālasa dzimtās valodas stundās. Par 100 lappusēm garāku tekstu bija lasījuši 21 % skolēnu latviešu valodas plūsmā, 32 % krievu valodas plūsmā un 47 % 7 salīdzinājuma valstīs, tostarp 51 % Igaunijā un 74 % Somijā. Latvijā visbiežāk norādītais apjoms bija 2 līdz 50 lappuses (58 %), bet 7 salīdzinājuma valstīs 101 līdz 500 lappuses (43 %). Skolās, kur garāku tekstu lasīšana ir biežāka, lasītprasmes rezultāts ir augstāks arī pēc sociālā fona statistiskas kontroles; skolu līmeņa korelācija ir 0,29. Latvijā šī sakarība ir vājāka nekā citās valstīs. Jautājums tika uzdots tikai 2018. gadā, tāpēc no PISA datiem nav iespējams noteikt tendenci laikā vai secināt, vai lasāmā apjoma pārmaiņas izrietējušas no mācību satura lēmumiem. To var pārbaudīt atsevišķi, analizējot programmu un standartu dokumentus. LU 2023. gada sekundāro pētījumu ziņojumā norādīta cieša saistība ar sasniegumiem, bet konkrēts ieteikums nav formulēts.</p>
+  </details>
+</section>
+
+<!-- 8 -->
+<section class="s" id="s08" data-title="Efekta lielumi">
+  <p class="kicker">8 · Cik lieli ir šie signāli</p>
+  <h2>Vairāku ilgtermiņa pārmaiņu efekta lielums ir būtisks arī tad, ja atsevišķu ciklu starpības nav statistiski nozīmīgas</h2>
+  <div class="kpis">
+    <div class="kpi bad"><div class="v">−0,44 SD</div><div class="l">vidējā rezultāta pārmaiņa 2003 → 2025 standartnovirzēs (SD); aptuveni divu mācību gadu ekvivalents, puse krituma pēdējos trīs gados</div></div>
+    <div class="kpi bad"><div class="v">−0,23 SD</div><div class="l">P95 augšgala pārmaiņa 2003 → 2015; aptuveni viena mācību gada ekvivalents pirms vidējā rezultāta krituma</div></div>
+    <div class="kpi bad"><div class="v">0,3 līdz 0,5</div><div class="l">Koena h: lasīšanas paradumu un grāmatu rādītāju pārmaiņu efekta lielums, 2000 līdz 2018</div></div>
+    <div class="kpi bad"><div class="v">−0,44 SD</div><div class="l">PIRLS 2021, 4. klase, pārmaiņa pret 2016. gadu; 5. procentile (P5) −0,82 SD</div></div>
+  </div>
+  <div class="chart" data-chart="efekti"></div>
+  <p>Agrīnā brīdināšanā nepietiek skatīties tikai uz statistisko nozīmību. Jāvērtē arī pārmaiņas lielums un tas, vai tā ir pietiekami liela, lai būtu nozīmīga izglītības politikas kontekstā.</p>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Etaloni.</strong> Kraft (2020, Educational Researcher 49(4)) apkopoja 1942 efektus no 747 randomizētiem izglītības eksperimentiem. Efektu mediāna bija 0,10 SD; par mazu efektu klasificēts mazāk par 0,05 SD, par vidēju 0,05 līdz 0,20 SD, par lielu vismaz 0,20 SD. Bloom, Hill, Black un Lipsey (2008) 8. un 9. klasē vienam mācību gadam lasīšanā atbilst aptuveni 0,24 SD pieaugumam. Ziņojumā šie lielumi izmantoti kā interpretācijas etaloni, nevis kā precīza pārrēķina formula.</p>
+    <p><strong>Mērvienības.</strong> d ir vidējo starpība, dalīta ar skolēnu standartnovirzi; latviešu valodas plūsmai tā dažādos ciklos ir 77 līdz 91 punkts, un aprēķinos izmantota abu ciklu apvienotā SD. Proporcijām izmantots Koena h. Intervālos ietverta arī saites kļūda. Apgalvojums, ka vidējā rezultāta pārmaiņas no 2006. līdz 2015. gadam nebija statistiski nozīmīgas, ir korekts, taču agrīnās brīdināšanas kontekstā būtisks ir arī pārmaiņu lielums. Lasīšanas paradumu un grāmatu rādītāju pasliktinājums pārsniedz tipisku izglītības intervences efektu, bet P95 augšgala sarukums ir aptuveni viena mācību gada etalona apmērā. Avots: docs/63, R/pisa2025/68.</p>
+  </details>
+</section>
+
+<!-- 9 -->
+<section class="s" id="s09" data-title="Simptomu modeļi">
+  <p class="kicker">9 · Simptomi un prognoze: ko modeļi spēj un ko ne</p>
+  <h2>Modeļi uztver daļu Latvijai specifiskās pārmaiņas, bet neparedz visām valstīm kopīgu kritumu</h2>
+  <p class="lead">Anketu rādītājus var izmantot divos dažādos mērogos, un secinājumi tajos atšķiras. Skolēna līmenī no anketas atbildēm (sociālais fons, motivācija, lasīšanas paradumi) var samērā labi paredzēt, kurš skolēns nākamajā ciklā lasīs labāk un kurš sliktāk. Valsts līmenī ir citādi: ja valstī anketu rādītāju vidējās vērtības no viena cikla uz nākamo mainās, no tā nevar paredzēt, ka mainīsies arī valsts vidējais lasīšanas rezultāts, jo lielākā daļa valsts vidējā pārmaiņu 2025. gadā ir kopīga visām valstīm un anketu rādītājos iepriekš neparādās. Tā nav pretruna, bet divi dažādi mērogi. Latvijai specifisko pārmaiņu daļu, salīdzinot ar citām valstīm, anketu rādītāji uztver daļēji.</p>
+  <table>
+    <thead><tr><th>Jautājums</th><th>Rezultāts</th><th>Secinājums</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Skolēna līmenī:</strong> vai no anketas atbildēm var paredzēt, kurš skolēns nākamajā ciklā lasīs labāk un kurš sliktāk?</td><td>Nākamā cikla R² 0,36 līdz 0,59. Informāciju dod sociālais fons un motivācija, skolas vide, iesaiste, lasīšanas paradumi un digitālā vide.</td><td class="n">jā, skolēnu atšķirības</td></tr>
+      <tr><td><strong>Valsts līmenī:</strong> vai no visas valsts anketu rādītāju pārmaiņām var paredzēt, ka valsts vidējais rezultāts mainīsies?</td><td>Ne labāk par modeli “nekas nemainās”. 2025. gada visām valstīm kopīgais kritums anketu rādītājos iepriekš nav redzams.</td><td class="n">nē, valsts vidējā pārmaiņu ne</td></tr>
+      <tr><td><strong>Valsts līmenī:</strong> vai no anketu rādītājiem var novērtēt Latvijai specifisko 2025. gada pārmaiņas daļu, salīdzinot ar citām valstīm?</td><td>−7,5 ± 2,8 punkti; rezultāts saglabājas 13 modeļa variantos</td><td class="n">daļēji</td></tr>
+      <tr><td>Vai 4. klases mērījums satur informāciju par rezultātu 15 gadu vecumā?</td><td>Latviešu valodas plūsmai 2025. gadā prognoze −4,3, faktiskā relatīvā pārmaiņa −4,7</td><td class="n">Latvijas datos jā</td></tr>
+      <tr><td>Vai lasīšanas vide un iesaiste paredz prasmes dinamiku laikā?</td><td>Rādītāji mainās līdzīgi, korelācija 0,7, bet modelī nav pierādījumu virzītai ietekmei, φ ≈ 0.</td><td class="n">nav pierādījumu</td></tr>
+      <tr><td>Vai HBSC labbūtības rādītāji paredz PISA pārmaiņas?</td><td>Pēc daudzkārtējo salīdzinājumu korekcijas neviens rādītājs nav statistiski nozīmīgs.</td><td class="n">neprognozē</td></tr>
+    </tbody>
+  </table>
+  <div class="chart" data-chart="dfm"></div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Skolēnu līmenis.</strong> Izmantotas PISA anketas 9 ciklos un 8 valstīs. Regularizētā regresija un gradienta pastiprināšanas modelis apmācīts ciklā t un pārbaudīts nākamajā ciklā t+1, tostarp 2018 → 2022 un 2022 → 2025. ESCS viens pats izskaidro 5 līdz 15 % rezultāta dispersijas. Ņemot vērā mērījuma kļūdu, teorētiski sasniedzamais skaidrotās dispersijas maksimums ir aptuveni 0,88.</p>
+    <p><strong>Latvijai specifiskā daļa.</strong> Dekompozīcija 2022 → 2025 dod −7,5 ± 2,8 punktus; 13 modeļa variantos rezultāts ir no −3,5 līdz −10,5. Izslēdzot divas pazīmes, kuru 2025. gada salīdzināmība ir apšaubāma, HOMEPOS un skolu anketas SC034Q02, novērtējums sarūk līdz −1,1 punktam. Tāpēc secinājums šeit vērtēts kā daļējs.</p>
+    <p><strong>Paaudžu modelis.</strong> Izmantots stāvokļa telpas modelis pa dzimšanas gadiem, kur PISA, PIRLS, TIMSS, ICCS un ICILS rezultāti traktēti kā viena latentā prasmes stāvokļa mērījumi. Katram PISA ciklam prognozē izmantoti tikai tie dati, kas bija publicēti pirms attiecīgā testa. Starp valstīm IEA dati prognozes kļūdu nesamazina, MAE 7,9 pret 6,7 tikai ar PISA, bet Latvijas gadījumā prognoze nedaudz uzlabojas, latviešu valodas plūsmai MAE 4,7 pret 5,2. PISA 2025 prognoze ar PIRLS bija −4,3, faktiskā relatīvā pārmaiņa −4,7. PISA 2029 prognoze ir −4,4 (SE 3,0), bet P10 −9,3 (SE 4,0). Šie novērtējumi balstīti tikai uz 7 secīgiem notikumiem vienā valstī, tāpēc nenoteiktība ir būtiska.</p>
+    <p><strong>Dinamiskais faktoru modelis.</strong> Grafikā modelēti trīs stāvokļi: prasme, lasīšanas vide, kā arī iesaiste un labbūtība, izmantojot PISA, IEA, PISA anketu un HBSC rādītājus. Latviešu valodas plūsmai relatīvs lasīšanas vides pasliktinājums sākas 1996. līdz 2001. gada dzimšanas paaudzēs, bet prasmes rādītājā 2007. līdz 2011. gada paaudzēs. Modeļa PISA 2025 relatīvās pārmaiņas prognoze bija −3,4. Avots: docs/61, 73; R/pisa2025/64, 67.</p>
+  </details>
+</section>
+
+<!-- 10 -->
+<section class="s" id="s10" data-title="Nacionālie dati">
+  <p class="kicker">10 · Nacionālie dati gada solī: VIAA eksāmeni un diagnosticējošie darbi</p>
+  <h2>Nacionālie dati ir pieejami katru gadu un aptver visu populāciju, bet bez enkuruzdevumiem un vienotas skalēšanas dažādu gadu rezultāti nav psihometriski salīdzināmi</h2>
+  <p class="lead">Katra gada eksāmens un diagnosticējošais darbs ir atsevišķs tests. Starp gadiem nav kopīgu enkuruzdevumu, vienotas skalēšanas un uzdevumu grūtības izlīdzināšanas, kādu lieto PISA un IEA pētījumos, tāpēc rezultātu starpība starp gadiem var atspoguļot gan prasmes pārmaiņu, gan darba grūtības un vērtēšanas stingrības pārmaiņu, un šīs daļas nošķirt nevar. Tāpēc nacionālo darbu rinda šeit lasāma kā orientējoša, nevis kā mērījums vienotā skalā.</p>
+  <div class="chart" data-chart="ce"></div>
+  <ul>
+    <li>PISA 2018 un 2022 paaudžu 9. klases lasīšanas rezultāti nebija starp vājākajiem, attiecīgi 4. un 6. vieta 16 gadu rindā. PISA 2025 paaudzes 2024./25. mācību gada rezultāts ir 16. vietā no 16. Tomēr visi trīs gadi ar centralizētu vērtēšanu atrodas zem gadiem, kuros darbus vērtēja skolas, tāpēc līmeņa pārmaiņu nevar interpretēt bez vērtēšanas režīma atrunas.</li>
+    <li>2024./25. mācību gadā kritums redzams visās rakstu daļās, bet mutvārdu daļas rezultāts ir salīdzinoši stabils.</li>
+  </ul>
+  <div class="chart" data-chart="dd"></div>
+  <div class="box good"><p>Ja nacionālajos pārbaudes darbos starp gadiem tiktu uzturēta psihometriska saite ar enkuruzdevumiem un vienotu skalēšanu (IRT) un būtu pieejami skolu līmeņa dati, tie varētu kļūt par agrīnās brīdināšanas sistēmas pamatu. Tas ļautu PISA ciklu starplaikos novērtēt, vai pārmaiņa jau ir sākusies un kurā izglītības posmā tā parādās. Tāpēc ir svarīga regulāra, psihometriski pareizi veidota izglītības snieguma monitorēšana: starptautiskie pētījumi notiek reizi trijos līdz piecos gados un to rezultāti kļūst pieejami ar nobīdi, bet nacionālie dati tiek vākti katru gadu, un tikai tad, ja tie ir salīdzināmi starp gadiem, no tiem var agrīni pamanīt pārmaiņas, pirms tās parādās starptautiskajos mērījumos.</p></div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Eksāmeni.</strong> Izmantoti VIAA kārtotāju līmeņa faili par 2011./12. līdz 2024./25. mācību gadu, 9. un 12. klases latviešu valodā un matemātikā; līdz 2021./22. gadam pieejama arī skolas programmas valoda. Rindā ir četri būtiski lūzumi: 2012./13. gadā vērtējums izteikts tikai procentos; 2019./20. gadā 9. klases eksāmeni atcelti; 2020./21. gadā eksāmenu vietā izmantoti diagnosticējošie darbi; 2022./23. gadā 9. klases eksāmens kļuva centralizēti vērtēts visiem skolēniem. Līdz tam latviešu programmu eksāmenus vērtēja skolas. Tāpēc kritumu no 62,9 % 2021./22. gadā līdz 54,6 % 2022./23. gadā nevar nošķirt no vērtēšanas režīma maiņas. 2024./25. gadā lasīšanas z ir −1,33, tekstveides −1,71, mutvārdu daļas −0,42. 12. klasē PISA 2018 paaudze, dzimuši 2002. gadā, ir 9. vietā no 11 gadiem.</p>
+    <p><strong>Diagnosticējošie darbi.</strong> Pieejami 324 publiski faili par 2009./10. līdz 2021./22. mācību gadu. No grafiku etiķetēm nolasīti 427 daļu vidējie, jo tabulas nav publiski pieejamas. 6. klases lasīšanas rezultāti svārstās no 54 līdz 80 %, bet starp gadiem nav IRT saites. PISA 2018, 2022 un 2025 paaudzes 6. klasē atrodas zem rindas vidus, attiecīgi 12., 11. un 9. vietā, bet 2014./15. gada kritums sakrīt ar formāta maiņu. 3. klasē neviena no šīm paaudzēm nav starp vājākajām.</p>
+    <p><strong>Skolu līmenis.</strong> Ģimnāziju un pārējo skolu rezultātu atšķirība 9. klasē ir 0,5 līdz 0,65 SD skolas vērtēšanas periodā un 0,85 SD centralizētās vērtēšanas periodā. Starpskolu ICC 9. klases eksāmenos ir 0,33 līdz 0,36, bet 12. klasē 0,43 līdz 0,50, bez skaidras tendences laikā. PISA latviešu valodas plūsmā ICC pieaug no 0,20 līdz 0,30, bet eksāmenu datos tajos periodos, kuros salīdzinājums iespējams, līdzīgs pieaugums nav redzams. Avots: docs/75, 81; R/pisa2025/79, 81.</p>
+  </details>
+</section>
+
+<!-- 11 -->
+<section class="s" id="s11" data-title="TALIS: skolotāji">
+  <p class="kicker">11 · Skolotāju puse: TALIS 2013, 2018, 2024</p>
+  <h2>TALIS 2024 jau pirms PISA 2025 rezultātiem rādīja jaunus skolotāju un resursu riska signālus</h2>
+  <div class="kpis">
+    <div class="kpi bad"><div class="v">11 → 60 %</div><div class="l">skolas, kur mācību materiālu trūkums traucē mācīšanu; salīdzinājuma valstīs 9 → 15 %</div></div>
+    <div class="kpi bad"><div class="v">23 → 44 %</div><div class="l">skolas, kur mācīšanu traucē kvalificētu skolotāju trūkums; salīdzinājuma valstīs 16 → 19 %</div></div>
+    <div class="kpi warn"><div class="v">44 → 58 %</div><div class="l">skolotāji 50 gadu vecumā un vecāki, 2013 → 2024</div></div>
+    <div class="kpi bad"><div class="v">59 → 68 %</div><div class="l">stress mainīgu iestāžu prasību dēļ; salīdzinājuma valstīs 47 → 40 %</div></div>
+  </div>
+  <div class="chart" data-chart="talis"></div>
+  <p>Resursu problēmu signāls bija redzams pirms PISA 2025 rezultātu publicēšanas un sakrīt ar PISA skolu anketu. Divu neatkarīgu datu avotu rezultāti sakrīt.</p>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Trīs cikli, trīs PISA paaudzes.</strong> TALIS 2013 raksturo skolotājus laikā, kad PISA 2015 paaudze bija 7. klasē; TALIS 2018 laikā, kad PISA 2018 paaudze bija 9. klasē; TALIS 2024, kas attiecas uz 2023./24. mācību gadu, laikā, kad PISA 2025 paaudze bija 8. klasē, vienu gadu pirms PISA testa. TALIS 2024 dati publicēti 2025. gada oktobrī, 11 mēnešus pirms PISA 2025 rezultātiem.</p>
+    <p><strong>Ilgstošs signāls visos trīs ciklos ir zemāka skolotāja profesijas pievilcība.</strong> To skolotāju īpatsvars, kuri izvēlētos skolotāja darbu vēlreiz, Latvijā mainījās 68 → 65 → 62 %, bet salīdzinājuma valstīs 77 → 73 → 72 %. Apgalvojumam “darba priekšrocības pārsniedz trūkumus” Latvijā piekrita 61 → 57 → 58 %, salīdzinājuma valstīs 73 līdz 74 %. <strong>Jauni riska signāli 2024. gadā:</strong> mācību materiālu trūkums diezgan daudz vai ļoti traucē 60 % skolu, salīdzinot ar 11 % iepriekš; kategorija “ļoti” pieaug no 1 % līdz 28 %. PISA skolu anketā latviešu valodas plūsmas skolās analogais rādītājs mainās 1,85 → 2,57 → 2,66 2018., 2022. un 2025. gadā. Kvalificētu skolotāju trūkums pieaug no 23 % līdz 44 %, atbalsta personāla trūkums no 34 % līdz 41 %, skolotāju vecumā 50+ īpatsvars no 44 % līdz 58 %. 47 % plāno strādāt vēl ne vairāk kā piecus gadus. Stress mainīgu iestāžu prasību dēļ pieaug no 59 % līdz 68 %, kamēr salīdzinājuma valstīs tas samazinās; starpību starpība ir +15 procentpunkti. Apgalvojumam “vienmēr prasa kaut ko mainīt” piekrīt 32 % Latvijas skolotāju pret 22 % salīdzinājuma valstīs.</p>
+    <p><strong>Rādītāji, kas nemainās vai uzlabojas.</strong> Dalība tālākizglītībā palielinās: kursos no 89 % līdz 97 %, skolotāju tīklos no 37 % līdz 71 %. Ar algu apmierināto īpatsvars pieaug no 22 % līdz 39 %, bet vispārējais stress samazinās no 64 % līdz 56 %. Vajadzība pēc profesionālās pilnveides mācību satura jomā 2018. gadā, pirms Skola2030 ieviešanas, bija augstāka, bet 2024. gadā samazinājusies līdz 12 %. Avots: OECD TALIS 2013, 2018, 2024; docs/72; R/pisa2025/77, 77b.</p>
+  </details>
+</section>
+
+<!-- 12 -->
+<section class="s" id="s12" data-title="Izdevumi uz skolēnu">
+  <p class="kicker">12 · Resursi: izdevumi uz vienu skolēnu 2000 līdz 2023</p>
+  <h2>PISA rezultātu krituma periodā Latvijas reālie izdevumi uz skolēnu nepieauga, kamēr Igaunijā un Lietuvā tie būtiski palielinājās</h2>
+  <div class="kpis">
+    <div class="kpi bad"><div class="v">−13 %</div><div class="l">Latvijas reālo izdevumu uz skolēnu pārmaiņa 2015 → 2022; Igaunijā +39 %, Lietuvā +40 %</div></div>
+    <div class="kpi warn"><div class="v">vienīgā</div><div class="l">Latvija ir vienīgā no 8 salīdzinātajām valstīm, kas 2023. gadā uz skolēnu tērē mazāk nekā 2015. gadā</div></div>
+    <div class="kpi"><div class="v">75 → 75</div><div class="l">tūkst. USD kumulatīvi uz kohortu 6 līdz 15 gadu vecumā, PISA 2022 un 2025 paaudzes</div></div>
+    <div class="kpi good"><div class="v">+5 līdz +18</div><div class="l">latviešu valodas plūsmas rezultāts virs izdevumu līknes visos PISA ciklos</div></div>
+  </div>
+  <h3>Reālie izdevumi uz vienu skolēnu, 2000 līdz 2023</h3>
+  <div class="chart" data-chart="izdevumi_rinda"></div>
+  <h3>Lasīšanas rezultāts pret izdevumu līkni: cik punktu virs vai zem tā, ko paredz valsts izdevumu līmenis</h3>
+  <p><strong>Kā tas aprēķināts.</strong> Katram PISA ciklam ņemtas visas valstis, kurām OECD publicē kumulatīvos izdevumus uz vienu skolēnu no 6 līdz 15 gadu vecumam (2025. gadā 42 valstis, 2006. gadā 23). Katrai valstij ir divi skaitļi: izdevumi un vidējais lasīšanas rezultāts. Cauri šiem punktiem novilkta līkne pret izdevumu logaritmu: jo lielāki izdevumi, jo augstāks rezultāts, bet ar dilstošu atdevi. Līkne katrai valstij dod sagaidāmo rezultātu tās izdevumu līmenī. Grafikā attēlota starpība starp faktisko un sagaidāmo rezultātu, punktos.</p>
+  <p><strong>Piemērs 2025. gadam.</strong> Latvijas kumulatīvie izdevumi ir aptuveni 73 tūkstoši USD uz skolēnu. Pie šāda līmeņa līkne paredz 443 punktus. Latvijas visu skolēnu rezultāts ir 430, tātad 13 punkti zem līknes. Latviešu valodas plūsmas rezultāts ir 459, tātad 16 punkti virs tās pašas sagaidāmās vērtības, jo abām rindām izdevumu līmenis ir viens un tas pats, Latvijas. Līdz 2022. gadam visa Latvija bija virs līknes par 1 līdz 16 punktiem; 2025. gadā zem līknes to nones krievu valodas plūsmas rezultāts. Septiņu salīdzinājuma valstu slānis rāda to pašu starpību katrai no tām, un tās visos ciklos ir virs līknes vairāk nekā Latvija, izņemot 2022. gadu.</p>
+  <div class="chart" data-chart="izdevumi_atlikumi"></div>
+  <div class="box"><p>Ar finansējuma apjomu vien PISA rezultātu pārmaiņas izskaidrot nevar. Tomēr Latvijas izdevumi nav pieauguši tādā pašā tempā kā vairākās salīdzinājuma valstīs. Tāpēc resursu dinamika šeit vērtējama kā potenciāls agrīns sistēmas signāls, nevis kā cēlonisks rezultātu skaidrojums.</p></div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Izdevumu rinda.</strong> No 2000. līdz 2008. gadam Latvijas reālie izdevumi uz skolēnu ISCED 1 un 2 līmenī, 2020. gada USD pēc pirktspējas paritātes, pieauga 2,8 reizes. No 2008. līdz 2010. gadam tie samazinājās par 20 %, bet 2015. gadā atgriezās 2008. gada līmenī. No 2015. līdz 2022. gadam Latvijas rādītājs samazinājās par 13 %, kamēr Igaunijā pieauga par 39 %, Lietuvā par 40 %, bet piecās pārējās salīdzinājuma valstīs vidēji par 19 %. Izdevumi kā daļa no IKP uz iedzīvotāju samazinājās no 28 % 2013. līdz 2015. gadā līdz 19 līdz 21 % 2022. līdz 2023. gadā.</p>
+    <p><strong>Kohortu izdevumi.</strong> Kumulatīvie reālie izdevumi no 6 līdz 15 gadu vecumam, tūkstošos USD, Latvijā bija 68 PISA 2015 paaudzei, 73 PISA 2018 paaudzei un 75 gan PISA 2022, gan PISA 2025 paaudzei. Igaunijā attiecīgās vērtības bija 83, 84, 90 un 99, Lietuvā 51, 59, 70 un 78. Tādējādi Latvija no valsts, kas uz kohortu tērēja vairāk nekā Lietuva, ir kļuvusi par valsti, kas tērē mazāk.</p>
+    <p><strong>Rezultāta novirze no izdevumu līknes.</strong> Starp valstīm lasīšanas rezultāts ir saistīts ar kumulatīvo izdevumu logaritmu; R² dažādos ciklos ir 0,24 līdz 0,47. Latviešu valodas plūsmas rezultāts visos septiņos ciklos ir 5 līdz 18 punktus virs modeļa prognozētās līknes. Visas Latvijas 2025. gada rezultāts ir 13,2 punktus zem līknes (SE 4,4), ko lielā mērā nosaka krievu valodas plūsmas kritums. Salīdzinot ar 7 valstu atlikumu, Latvija ir zem salīdzinājuma valstīm sešos no septiņiem cikliem. Izdevumu pārmaiņas starp valstīm neprognozē lasīšanas pārmaiņas: 8 valstīs r = −0,01, bet 33 valstu fiksēto efektu modelī β = −0,10 uz 1 % izdevumu pieauguma (SE 0,10). Tātad šie dati nerāda vienkāršu cēloņsakarību starp lielākiem izdevumiem un nākamā cikla rezultāta pieaugumu. Avots: OECD Education at a Glance, Eurostat, Pasaules Banka; docs/65; R/pisa2025/71.</p>
+  </details>
+</section>
+
+<!-- 13 -->
+<section class="s" id="s13" data-title="HBSC (SPKC)">
+  <p class="kicker">13 · SPKC dati: HBSC skolas vide un labbūtība</p>
+  <h2>HBSC labbūtības rādītāji neprognozē PISA pārmaiņas, bet papildina ainu par skolas vidi pirms 15 gadu vecuma</h2>
+  <p><strong>Kā lasīt grafiku.</strong> Katrs punkts rāda, kur Latvijas 11 vai 13 gadus vecie skolēni atradās salīdzinājumā ar septiņu salīdzinājuma valstu vidējo tajā pašā HBSC kārtā, izteikts valstu izkliedes vienībās (z). Nulle nozīmē tādu pašu līmeni kā salīdzinājuma valstīs. Rādītājiem, kur lielāka vērtība ir labāk (patīk skola, atbalsts, labas sekmes, dzīves apmierinātība), vērtība atlikta tāda, kāda ir. Rādītājiem, kur lielāka vērtība ir sliktāk (skolas spiediens, ņirgāšanās, nomāktība, nervozitāte, miega grūtības, psihosomatiskas sūdzības), zīme apgriezta, un rindas nosaukumā tas atzīmēts ar "apgriezts". Piemēram, miega grūtību punkts tālu pa kreisi nozīmē, ka Latvijas skolēniem miega grūtību ir daudz vairāk nekā salīdzinājuma valstīs. Tāpēc visām rindām punkts pa labi no nulles nozīmē, ka Latvijas skolēniem ir labvēlīgāk nekā salīdzinājuma valstīs, un pa kreisi, ka nelabvēlīgāk.</p>
+  <div class="chart" data-chart="hbsc_exante"></div>
+  <ul>
+    <li>HBSC datos nav skaidra agrīna signāla PISA 2025 kritumam. PISA 2025 paaudzes rādītāji 13 gadu vecumā 2021./22. gadā kopumā bija relatīvi labāki nekā vairākām iepriekšējām Latvijas paaudzēm.</li>
+    <li>Ilgtermiņa relatīvā aina ir stabila. Latvijas pusaudži salīdzinājumā ar 7 valstīm biežāk norāda, ka viņiem patīk skola, un izjūt mazāku skolas spiedienu. Savukārt dzīves apmierinātības, pašvērtētās veselības, ģimenes un vienaudžu atbalsta un ņirgāšanās rādītāji ilgstoši ir relatīvi nelabvēlīgāki.</li>
+  </ul>
+  <div class="chart" data-chart="hbsc_rinda"></div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Dati.</strong> Izmantoti HBSC atvērtās piekļuves mikrodati par 2001/02, 2005/06, 2009/10, 2013/14 un 2017/18, kā arī HBSC pārlūka apkopojumi par 2021/22. gadu. Mikrodatiem izmantota 8 valstu izlase ar skolu klasteru standartkļūdām. Analizēti rādītāji par attieksmi pret skolu, skolas spiedienu, skolotāju un klasesbiedru atbalstu, ņirgāšanos, dzīves apmierinātību, veselību, psihosomatiskajām sūdzībām, miegu, ģimenes un vienaudžu atbalstu un pašvērtētajām sekmēm. Atvērtajos failos valodu plūsmas nav iespējams nodalīt.</p>
+    <p><strong>Iepriekšēja prognozes pārbaude.</strong> Analizēti 30 rādītāji un 38 punkti piecos notikumos. Pēc daudzkārtējo salīdzinājumu korekcijas neviens atsevišķs rādītājs nav statistiski nozīmīgs; saliktā rādītāja korelācija ir r = −0,30, turklāt pretējā virzienā gaidītajam. PISA 2025 paaudzei 13 gadu vecumā saliktais rādītājs ir −0,05, skolas patika +0,86 un skolotāju atbalsts +0,85. Saliktā rādītāja pārmaiņa no 11 līdz 13 gadiem ir +0,38 z, bet PISA relatīvā pārmaiņa no 2022. līdz 2025. gadam visai Latvijai −31,2 punkti. Vēlāks signāls parādās 15 gadu vecumā: skolas patika mainās no +0,63 z 1994. gada paaudzē līdz −0,44 2007. gada paaudzē, bet skolas spiediens no +0,92 līdz −0,06. Tā kā līdzīga pārmaiņa 11 un 13 gadu vecumā nav redzama, šis drīzāk ir vienlaicīgs, ne agrīns signāls.</p>
+    <p><strong>Ko tas nozīmē.</strong> Šajā analīzē HBSC labbūtības rādītāji nav izrādījušies par uzticamu agrīnu lasītprasmes signālu. Tas ir svarīgi, veidojot brīdināšanas sistēmu, lai tajā neiekļautu rādītājus tikai tāpēc, ka tie teorētiski šķiet saistīti ar sasniegumiem. HBSC 2025/26 datu vākšana notiek pašlaik. Tā būs pirmais HBSC mērījums PISA 2025 paaudzei pēc 15 gadu vecuma un PISA 2029 paaudzei 13 gadu vecumā. Avots: docs/78; R/pisa2025/65c.</p>
+  </details>
+</section>
+
+<!-- 14 -->
+<section class="s" id="s14" data-title="Pārmaiņu robežjosla">
+  <p class="kicker">14 · Cik ātri rezultāti vispār var mainīties</p>
+  <h2>Starptautiskā PISA vēsture rāda, cik lielas pārmaiņas no Latvijas sākuma līmeņa parasti ir novērotas</h2>
+  <div class="chart" data-chart="aploksne"></div>
+  <div class="kpis">
+    <div class="kpi"><div class="v">−1,2</div><div class="l">mediānas pārmaiņa gadā valstīm ar sākuma līmeni 470 līdz 520 punkti; P5 −6,7, P95 +5,7</div></div>
+    <div class="kpi bad"><div class="v">−15,0</div><div class="l">visas Latvijas 2022 → 2025 pārmaiņa gadā; 2. lielākais kritums no 436 secīgu ciklu pāriem</div></div>
+    <div class="kpi warn"><div class="v">10. procentile</div><div class="l">latviešu valodas plūsmas 2022 → 2025 pārmaiņa, −5,8 punkti gadā</div></div>
+    <div class="kpi warn"><div class="v">15. procentile</div><div class="l">latviešu valodas plūsmas 2018 → 2025 pārmaiņa, −3,65 punkti gadā; pirms Covid perioda atsauces grupā 2. procentile</div></div>
+  </div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Metode.</strong> Izmantotas visas PISA valstis no 2000. līdz 2025. gadam, pamatojoties uz OECD PISA 2025 I sējuma B1 pielikumu. Katram secīgu ciklu pārim aprēķināta pārmaiņa gadā atkarībā no sākuma līmeņa. P5, P25, P50, P75 un P95 kvantiles iegūtas regresijā ar ciklu pāru fiksētajiem efektiem. Atsevišķi marķēti periodi ar zināmu instrumenta maiņu vai ārēju notikumu: 2012 → 2015 datorizācija, 2015 → 2018 adaptīvā lasīšana un 2018 → 2022 Covid-19 periods. Izlases standartkļūda un saites kļūda veido aptuveni 13 līdz 15 % no novērotās dispersijas; pēc šī trokšņa korekcijas sadalījuma galējās vērtības mainās par 0,2 līdz 0,9 punktiem gadā.</p>
+    <p><strong>Rezultāti.</strong> Vēsturisko pārmaiņu diapazons ir asimetrisks. Valstīm ar augstāku sākuma līmeni strauja uzlabojuma iespējamais temps samazinās: P95 ir +7,0 punkti gadā pie 450 punktu sākuma līmeņa un +3,3 pie 520 punktiem. Savukārt P5 krituma robeža saglabājas ap −7 punktiem gadā. Kopš 2018. gada tipiska valsts Latvijas līmenī lasīšanā zaudē aptuveni 3 līdz 4 punktus gadā. Latviešu valodas plūsmas 2018 → 2025 pārmaiņu temps Covid perioda atsauces grupā atrodas ap 12. līdz 15. procentili, bet pirms Covid perioda atsauces grupā ap 2. procentili. Tā pati pieeja anketu vienumiem var palīdzēt identificēt iespējamas instrumenta izmaiņas: ja vienlaikus daudzās valstīs novērotā pārmaiņa pārsniedz vienuma iepriekšējo vēsturisko diapazonu, tas ir signāls pārbaudīt instrumenta salīdzināmību. Piemērs ir SC034Q02 Latvijā, kur augstākā kategorija mainās no 1 % līdz 57 %. Avots: docs/84; R/pisa2025/83.</p>
+  </details>
+</section>
+
+<!-- 15 -->
+<section class="s" id="s15" data-title="Atgriešanās horizonts">
+  <p class="kicker">15 · Atgriešanās horizonts</p>
+  <h2>Atgriešanās līdz 2018. gada līmenim jau 2029. gadā prasītu vēsturiski ļoti strauju uzlabojumu</h2>
+  <div class="chart" data-chart="atgriesanas"></div>
+  <ul>
+    <li>Valstīm ar līdzīgu sākuma līmeni mediānas pārmaiņa vēsturiski ir tuva nullei. P95 uzlabojuma temps 2018. gada līmeni sasniegtu aptuveni 2032. gadā, bet vēsturiski straujākais novērotais temps teorētiski ļautu tam pietuvoties ap 2029. gadu.</li>
+    <li>No 440 līdz 500 punktu sākuma līmeņa par 25 vai vairāk punktiem 3 līdz 7 gados uzlabojušies 9 gadījumi 7 valstīs. Visi šie gadījumi ir periodā no 2000. līdz 2012. gadam; pēc 2012. gada šāds kāpums analizētajos datos nav novērots.</li>
+  </ul>
+  <div class="box warn"><p>Mērķis ir noderīgs plānošanai tikai tad, ja ļauj atšķirt sagaidāmu, labu un nepietiekamu progresu. Ja mērķvērtība atrodas ārpus vēsturiski tipiska pārmaiņu diapazona, nepieciešami arī starpposma rādītāji, pēc kuriem var vērtēt progresu pirms gala termiņa.</p></div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p>Lai no koriģētā 2025. gada rezultāta 470,6 punktiem atgrieztos 2018. gada līmenī 496,2, nepieciešams pieaugums par 25,6 punktiem. Valstīm ar sākuma līmeni 440 līdz 500 punkti 6 līdz 7 gadu periodā mediānas pārmaiņa ir −0,2 punkti gadā, P95 +3,8 punkti gadā, bet vēsturiski straujākais novērotais temps +6,7 punkti gadā. Līdz 2029. gadam būtu vajadzīgi vidēji +6,4 punkti gadā, kas pārsniedz P95 visās izmantotajās atsauces grupās; 3 līdz 4 gadu logos P95 ir +6,0. Strauju kāpumu piemēri pirms 2012. gada ir Polija pēc 1999. gada reformas, Turcija aptvēruma pieauguma periodā, Luksemburga ar 2000. gada administrēšanas atšķirībām un Īrijas 2009. gada anomālija. Avots: docs/84; R/pisa2025/83.</p>
+  </details>
+</section>
+
+<!-- 16 -->
+<section class="s" id="s16" data-title="Scenāriji 2029 līdz 2035">
+  <p class="kicker">16 · Scenāriji 2029, 2032, 2035</p>
+  <h2>Vēsturiskie dati ļauj veidot scenāriju koridoru līdz 2035. gadam, nevis vienu precīzu prognozi</h2>
+  <div class="chart" data-chart="koridors"></div>
+  <div class="two">
+    <div>
+      <h3>Zem 2. līmeņa lasīšanā, %</h3>
+      <table>
+        <thead><tr><th>Scenārijs</th><th class="n">2025</th><th class="n">2029</th><th class="n">2032</th><th class="n">2035</th></tr></thead>
+        <tbody>
+          <tr class="bad"><td>Apakšējā robeža, sliktākās ceturtdaļas scenārijs</td><td class="n">28,5</td><td class="n">34</td><td class="n">34</td><td class="n">35</td></tr>
+          <tr><td>Tipiskais scenārijs</td><td class="n">28,5</td><td class="n">31</td><td class="n">30</td><td class="n">30</td></tr>
+          <tr class="good"><td>Vēlamais virziens, labākās ceturtdaļas scenārijs</td><td class="n">28,5</td><td class="n">26</td><td class="n">25</td><td class="n">26</td></tr>
+          <tr><td>Vēsturiski straujākais uzlabojums</td><td class="n">28,5</td><td class="n">20,5</td><td class="n">19,6</td><td class="n">17,6</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>Vidējais punktu skaits lasīšanā</h3>
+      <table>
+        <thead><tr><th>Scenārijs</th><th class="n">2025</th><th class="n">2029</th><th class="n">2032</th><th class="n">2035</th></tr></thead>
+        <tbody>
+          <tr class="bad"><td>Apakšējā robeža</td><td class="n">459</td><td class="n">443</td><td class="n">443</td><td class="n">441</td></tr>
+          <tr><td>Tipiskais scenārijs</td><td class="n">459</td><td class="n">453</td><td class="n">455</td><td class="n">455</td></tr>
+          <tr class="good"><td>Vēlamais virziens</td><td class="n">459</td><td class="n">467</td><td class="n">470</td><td class="n">467</td></tr>
+          <tr><td>Vēsturiski straujākais uzlabojums</td><td class="n">459</td><td class="n">483</td><td class="n">486</td><td class="n">493</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <h3>Skolēnu daļa zem 2. kompetences līmeņa un augstākajos līmeņos: vēsture un scenāriji līdz 2035. gadam</h3>
+  <p><strong>Kā lasīt grafiku.</strong> Sākotnējā skatā attēlota skolēnu daļa zem 2. kompetences līmeņa, tāpēc līknes kāpums nozīmē pasliktināšanos: lasīšanā šī daļa latviešu valodas plūsmā pieauga no 15 procentiem 2003. gadā līdz 29 procentiem 2025. gadā. Trīs scenāriji pēc 2025. gada ir ņemti no citu valstu vēsturiskās pieredzes ar līdzīgu sākuma līmeni: slikts gadījums, tipiska valsts un labākā ceturtdaļa. Arī labākās ceturtdaļas scenārijā daļa zem 2. līmeņa līdz 2035. gadam nenokrīt līdz Eiropas Savienības mērķim, 15 procentiem. Izvēlnē var pārslēgties uz augstāko līmeņu daļu, kur līknes kāpums nozīmē uzlabošanos.</p>
+  <div class="chart" data-chart="dalas"></div>
+  <p>Izmantotajos vēsturiskajos scenārijos Eiropas Savienības (ES) mērķis, 15 % skolēnu zem 2. kompetences līmeņa lasīšanā un matemātikā, līdz 2035. gadam netiek sasniegts. Arī 10 % vai 12 % skolēnu augstāko kompetences līmeņu grupā līdz 2035. gadam nevienā jomā netiek sasniegti.</p>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Metode.</strong> Izmantotas visas 91 PISA valsts un ekonomika no 2000. līdz 2025. gadam. Katrai jomai atlasīti secīgu ciklu pāri valstīm, kuru sākuma līmenis ir ±30 punktu ap latviešu valodas plūsmas 2025. gada līmeni: lasīšanā 459,2 oficiālajā un 470,6 koriģētajā skalā, matemātikā 475,5, dabaszinātnēs 495,3. Izmantoti viena cikla logi līdz 2029. gadam, divu ciklu logi līdz 2032. gadam un trīs ciklu logi līdz 2035. gadam. Scenārijiem izmantotas P10, P25, P50, P75 un P95 kvantiles. Skolēnu īpatsvars zem 2. līmeņa un augšgalā atvasināts no starpvalstu sakarības ar vidējo rezultātu, kur R² ir 0,88 līdz 0,99, un piesaistīts Latvijas 2025. gada sākuma daļai. Tiešā pārbaude pret īpatsvaru vēsturisko diapazonu dod aptuveni ±2 procentpunktu atšķirību. Grafikā var izvēlēties trīs atsauces kopas: visus ciklu pārus, pārus bez marķētām instrumenta vai ārēju notikumu pārmaiņām un tikai Covid perioda datus.</p>
+    <p><strong>Piemēri.</strong> Valstis, kas sāka aptuveni Latvijas līmenī, vēsturiski virzījušās ļoti atšķirīgi. Polija no 2000. līdz 2006. gadam pieauga par 29 punktiem, Spānija no 2006. līdz 2012. gadam par 27, Čehija no 2009. līdz 2015. gadam par 9. Savukārt Slovākija no 2012. līdz 2018. gadam samazinājās par 5 punktiem, Itālija no 2018. līdz 2025. gadam par 2, Nīderlande par 43 un Islande par 52 punktiem. Tātad arī nelabvēlīgais scenārijs balstīts reāli novērotās pārmaiņās.</p>
+    <p><strong>Mērķu sasniedzamība.</strong> Vēsturiski straujākā uzlabojuma scenārijā 15 % zem 2. kompetences līmeņa lasīšanā tiktu sasniegti ap 2037. gadu, matemātikā ap 2039. gadu. Dabaszinātnēs šis līmenis būtu sasniedzams jau 2029. gadā, bet tikai vēsturiski straujākā scenārijā. 10 % skolēnu augšgalā lasīšanā šādā scenārijā tiktu sasniegti ap 2043. gadu; matemātikā 9,9 % iespējami 2035. gadā. Latvijas rezultātu sadalījums ir salīdzinoši saspiests abos galos: skolēnu zem 2. līmeņa ir par 2 līdz 4 procentpunktiem mazāk un augšgalā par 1,6 līdz 3,2 procentpunktiem mazāk, nekā prognozētu tikai vidējais rezultāts. Pilns ieteikums IZM rādītāju kopai: docs/85, 86, 87; R/pisa2025/84, 84b.</p>
+  </details>
+</section>
+
+<!-- 17 -->
+<section class="s" id="s17" data-title="Nākamās paaudzes">
+  <p class="kicker">17 · Kas jau tagad zināms par nākamajām paaudzēm</p>
+  <h2>Par PISA 2029 paaudzi pirmie signāli ir pieejami jau tagad, un līdz 2029. gadam būs vairāki jauni mērījumi</h2>
+  <table>
+    <thead><tr><th>Signāls</th><th>Paaudze</th><th>Ko rāda dati</th><th>Publiski kopš</th></tr></thead>
+    <tbody>
+      <tr class="bad"><td>PIRLS 2016 → 2021, 4. klase</td><td>dzimuši 2006 un 2011 (PISA 2022 paaudze un paaudze starp PISA 2025 un 2029)</td><td>latviešu valodas plūsma −30 punkti; relatīvi pret 7 valstīm −16,9; P5 −56; zem 400 punktiem 0,8 → 6,3 %</td><td>2023. gada maijs</td></tr>
+      <tr class="bad"><td>TIMSS 2019 → 2023, 4. klase, matemātika</td><td>dzimuši ap 2009 un ap 2013 (PISA 2025 un 2029)</td><td>relatīvi −15,9</td><td>2024. gada decembris</td></tr>
+      <tr class="bad"><td>9. klases eksāmeni 2024./25.</td><td>dzimuši 2009 (PISA 2025)</td><td>vājākais rezultāts 16 gadu rindā visās rakstu daļās, ar vērtēšanas režīma atrunu</td><td>2025. gada vasara</td></tr>
+      <tr class="bad"><td>TALIS 2024</td><td>skolotāji, PISA 2025 paaudze 8. klasē</td><td>mācību materiālu trūkums 60 % skolu, kvalificētu skolotāju trūkums 44 %, pārmaiņu noguruma pazīmes</td><td>2025. gada oktobris</td></tr>
+      <tr><td>Paaudžu modelis: PISA 2029 prognoze</td><td>dzimuši 2013</td><td>latviešu valodas plūsmas relatīvās pozīcijas prognoze −4,4 (standartkļūda SE 3,0); P10 −9,3 (SE 4,0)</td><td>aprēķins, 2026. gada septembris</td></tr>
+    </tbody>
+  </table>
+  <h3>Kad nāks nākamie dati</h3>
+  <table>
+    <thead><tr><th>Mērījums</th><th>Mērījuma laiks</th><th>Plānotā datu pieejamība</th><th>Ko varēs novērtēt</th></tr></thead>
+    <tbody>
+      <tr><td>HBSC 2025/26 (SPKC)</td><td>2025./26. m. g.</td><td>pārlūks ap 2027. gadu, mikrodati ap 2030. gadu</td><td>PISA 2025 paaudzi 15 gadu vecumā pēc PISA testa un PISA 2029 paaudzi 13 gadu vecumā</td></tr>
+      <tr><td>PIRLS 2026</td><td>2026</td><td>2027. gada beigas</td><td>PISA 2032 paaudzes pirmo lasīšanas mērījumu 4. klasē pēc PIRLS 2021 krituma</td></tr>
+      <tr><td>TIMSS 2027</td><td>2027</td><td>2028. gada beigas</td><td>PISA 2032 paaudzi 4. klasē un PISA 2029 paaudzi 8. klasē</td></tr>
+      <tr><td>VIAA eksāmeni, diagnosticējošie darbi</td><td>katru gadu</td><td>tā paša gada vasara</td><td>PISA 2029 paaudzi 6. klasē 2025./26. gadā un 9. klasē 2028./29. gadā</td></tr>
+      <tr><td>PISA 2029</td><td>2029. gada pavasaris</td><td>2030. gada beigas</td><td>pirmo PISA ciklu, kurā visi Latvijas dalībnieki mācās latviešu valodā; Nacionālā attīstības plāna (NAP 2034) horizontam tuvāks būs PISA 2032</td></tr>
+    </tbody>
+  </table>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p>Par PISA 2029 paaudzi jau ir zināms, ka 4. klasē tās relatīvais matemātikas rezultāts bija zemāks nekā iepriekšējai paaudzei, bet tai tuvā paaudze PIRLS lasīšanā kritās par 30 punktiem. TALIS dati vienlaikus rāda vairākus skolotāju un resursu riska signālus. Nacionālie dati šo paaudzi novēros 6. klasē 2025./26. mācību gadā un 9. klasē 2028./29. gadā. Tāpēc agrīnās brīdināšanas sistēmai nav nepieciešams jauns atsevišķs pētījums; nepieciešams esošos mērījumus savienot pa paaudzēm un regulāri atjaunot. Paaudžu modeļa PISA 2029 prognoze visai Latvijai ir +11,6 punkti, taču tā galvenokārt atspoguļo modeļa sagaidītu atgriešanos pēc ļoti zemā 2025. gada rezultāta un nav interpretējama kā droša uzlabojuma prognoze.</p>
+  </details>
+</section>
+
+<!-- 18 -->
+<section class="s" id="s18" data-title="Ko tas nozīmē mērķiem">
+  <p class="kicker">18 · Ko tas nozīmē mērķiem un lēmumiem</p>
+  <h2>Septiņi secinājumi rādītāju kopai un plānošanai</h2>
+  <ol>
+    <li><strong>Izmantot scenāriju diapazonu, ne vienu mērķa skaitli.</strong> Par apakšējo robežu var izmantot sliktākās ceturtdaļas vēsturisko scenāriju, bet par vēlamo virzienu labākās ceturtdaļas scenāriju. Rezultāts zem apakšējās robežas būtu signāls papildu rīcībai. Rezultāts virs vēlamā virziena norādītu uz straujāku progresu nekā izvēlētais vēsturiskais etalons, bet pats par sevi vēl nepierādītu konkrēta pasākuma cēloņefektu.</li>
+    <li><strong>Sekot arī relatīvajai pozīcijai.</strong> Viens no rādītājiem var būt nosacījums, ka atstatums no OECD vidējā nepasliktinās. Tas daļēji neitralizē visām valstīm kopīgas pārmaiņas. Vēsturiski šādu nosacījumu izpilda aptuveni 50 līdz 70 % valstu atkarībā no perioda.</li>
+    <li><strong>15 % un 10 % izmantot kā ilgtermiņa virzienu līdz apmēram 2040. gadam,</strong> nevis kā vienīgo kritēriju 2029. vai 2032. gada rezultātu vērtēšanai.</li>
+    <li><strong>Mērķvērtības balstīt latviešu valodas plūsmas sākuma līmenī, bet publisko ziņošanu saglabāt saskaņā ar OECD.</strong> 2025. un 2029. gada kopējais valsts rādītājs populācijas un mācību valodas sastāva maiņas dēļ nebūs tieši salīdzināms.</li>
+    <li><strong>2029. gadam iepriekš noteikt kontrolpunktu un rīcību.</strong> Jau pirms rezultātu saņemšanas jāvienojas, kāda rīcība seko, ja skolēnu īpatsvars zem 2. kompetences līmeņa lasīšanā pārsniedz 34 % vai pasliktinās atstatums no OECD vidējā.</li>
+    <li><strong>Pasākumus, kur iespējams, ieviest pakāpeniski un mērāmi.</strong> Ja vienu pasākumu visās skolās ievieš vienlaikus, pēc PISA vien būs grūti noteikt, vai tieši tas izraisījis novēroto pārmaiņu.</li>
+    <li><strong>Pirms dažu sociālā fona rādītāju izmantošanas pārbaudīt 2025. gada instrumenta salīdzināmību.</strong> sociālekonomiskā statusa indeksa (ESCS) komponentēs un atsevišķos skolu anketas vienumos ir pazīmes, kas var būt saistītas ar administrēšanas vai instrumenta izmaiņām. Līdz to noskaidrošanai ES mērķis par nelabvēlīgas izcelsmes skolēniem nav droši salīdzināms ar iepriekšējiem cikliem.</li>
+  </ol>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p><strong>Relatīvā pozīcija.</strong> Atstatums no OECD-23 vidējā lasīšanā oficiālajā skalā bija +1,8 punkti 2003. gadā, −12,4 2006., −7,9 2015., −6,2 2018., −3,4 2022. un −6,7 2025. gadā. No 2022. līdz 2025. gadam OECD-23 vidējais lasīšanā samazinājās par 16 punktiem. To valstu īpatsvars, kurām atstatums no OECD vidējā nepasliktinājās, bija 55 % četru gadu periodā, 64 % septiņu gadu periodā un 69 % desmit gadu periodā.</p>
+    <p><strong>Kontrolpunkts.</strong> Kontrolpunkts ir lietderīgs tikai tad, ja iepriekš noteikts, kas notiek pie nelabvēlīga rezultāta: kāds ir rezerves plāns, finansējums un atbildīgais lēmējs. Pakāpeniska ieviešana caurspīdīgā secībā ļauj nacionālajos datos vērtēt saistību starp pasākuma intensitāti un rezultātu jau pirms 2029. gada. Skola2030 gadījumā visas skolas pārgāja uz jauno saturu vienlaikus, tāpēc no PISA datiem vien reformas ietekmi atdalīt no citām vienlaicīgām pārmaiņām nevar.</p>
+    <p><strong>Instrumenta salīdzināmība.</strong> PISA 2025 ESCS komponentēs redzamas vairākas izmaiņas: HISEI vidējais palielinās no 52,3 līdz 59,2, HOMEPOS samazinās, bet skolēnu bez ESCS ir aptuveni desmitreiz vairāk. Skolu anketas SC034Q02 augstākā kategorija mainās no 1 % līdz 57 %. To skolēnu īpatsvars, kuriem mājas valoda atšķiras no testa valodas, mainās no 11 % līdz 33 %, un šeit iespējama administrēšanas, nevis populācijas pārmaiņu ietekme. Jautājumi PISA nacionālajam centram Latvijā (Latvijas Universitātes Pedagoģijas, psiholoģijas un mākslas fakultātes Izglītības pētniecības institūts) sagatavoti vēstules formā, docs/71. Avots: docs/85 5. sadaļa, docs/86, 87.</p>
+  </details>
+</section>
+
+<!-- 19 -->
+<section class="s" id="s19" data-title="Brīdināšanas sistēma">
+  <p class="kicker">19 · Agrīnās brīdināšanas sistēma: kas vajadzīgs</p>
+  <h2>Agrīnās brīdināšanas sistēmu var veidot galvenokārt no jau pieejamiem datiem un skaidriem analīzes noteikumiem</h2>
+  <div class="two">
+    <div>
+      <h3>Dati un piekļuve</h3>
+      <ul>
+        <li><strong>Valodu plūsmas analizēt atsevišķi visos avotos,</strong> kur tas metodiski iespējams, tostarp HBSC un nacionālajos darbos. Pēc 2029. gada plūsmu definēšanai izmantot mājās lietoto valodu.</li>
+        <li><strong>Izveidot psihometrisku saiti starp nacionālo darbu gadiem,</strong> izmantojot enkuruzdevumus un IRT 3., 6. un 9. klasē, un nodrošināt pētniekiem piekļuvi skolu līmeņa datiem.</li>
+        <li><strong>Nodrošināt PISA skolu tipa informāciju</strong> un PISA 2025 aptvēruma un izslēgšanas datus, lai varētu pārbaudīt skolu sastāva ietekmi.</li>
+        <li><strong>Uzturēt vienotu paaudžu paneli,</strong> kur visi mērījumi savienoti pēc dzimšanas gada un vecuma un dati tiek atjaunoti pēc katra jauna pētījuma. Šāds panelis analīzes vajadzībām jau ir izveidots.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Lasīšanas noteikumi</h3>
+      <ul>
+        <li><strong>Brīdinājuma slieksni noteikt arī efekta lielumos,</strong> ne tikai pēc p vērtības. Darba slieksnis var būt 0,20 SD vai aptuveni viena mācību gada ekvivalents pret iepriekšējo paaudzi.</li>
+        <li><strong>Sekot relatīvajai vietai pret iepriekš noteiktu valstu kopu,</strong> ne tikai absolūtajam rezultātam. Modeļi nespēj paredzēt visām valstīm kopīgas pārmaiņas, bet relatīvās pozīcijas pārmaiņas ir prognozējamākas.</li>
+        <li><strong>Iekļaut agrīnos konteksta rādītājus:</strong> lasīšanas paradumus, grāmatas mājās, garu tekstu lasīšanu skolā un skolotāju resursus. Tie nav cēloņi paši par sevi, bet var kalpot kā vadošie rādītāji vairāku gadu horizontā.</li>
+        <li><strong>Veidot ziņojumu reģistru:</strong> katram nacionālajam ziņojumam fiksēt publicēšanas datumu, galveno vēstījumu un to, kā tas saskan ar attiecīgā cikla datiem.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="box"><p><strong>Ko iespējams prognozēt savlaicīgi.</strong> Nākamās paaudzes relatīvo vietu var vērtēt aptuveni 4 līdz 6 gadus pirms PISA, izmantojot 4. klases mērījumus. Ilgtermiņa virzienu var papildināt ar lasīšanas vides rādītājiem, skolotāju resursu signālus iegūt aptuveni gadu pirms PISA no TALIS, bet sistēmas stāvoklim starp PISA cikliem izmantot nacionālos darbus. <strong>Ko pašreizējie modeļi neprognozē.</strong> Tie neparedz visām valstīm kopīga krituma apjomu, kāds bija novērots 2025. gadā.</p></div>
+  <h3>Kā no pareizas mērīšanas nonākam pie labiem lēmumiem: cikls ar prognozi uz priekšu un pārbaudi atpakaļ</h3>
+  <p class="lead">Mērīšana, dati, prognoze un lēmums nav četri atsevišķi soļi, bet viens cikls. Pareiza mērīšana dod salīdzināmus datus; no tiem var prognozēt uz priekšu, kā mainīsies nākamā paaudze, un lēmumu par intervenci pieņemt laikus, ar iepriekš pateiktu gaidāmo efektu. Kad pienāk reālie rezultāti, prospektīvie pēc lēmuma un retrospektīvie no jau zināmās vēstures, prognozi pārbauda atpakaļ: kļūda labo modeli, un starpība starp faktu un prognozi bez intervences ir intervences novērtētais efekts. Ar katru kārtu prognozes kļūst precīzākas, un līdz ar tām arī secinājumi par to, kas izglītībā patiešām iedarbojas.</p>
+  <p>OECD un IEA datiem šajā ciklā ir īpaša loma, jo tie ir neatkarīgs mērījums vienotā skalā, kuru mēs paši neveidojam. Tāpēc tos var izmantot ne tikai retrospektīvi, lai novērtētu, kas ir noticis, bet arī lai pārbaudītu, cik labi esam prognozējuši: prognozi, kas izteikta un fiksēta pirms rezultātu publicēšanas, salīdzina ar vēlāk publicēto rezultātu, un prognozes kļūda ir modeļa kvalitātes mērs. Citu valstu rindas ļauj modeli pārbaudīt jau pirms tā lietošanas Latvijai, prognozējot to vēsturi no agrākiem datiem, un salīdzināt Latvijas prognozes kļūdu ar citu valstu kļūdām. Visbeidzot, starptautiskie dati ļauj nošķirt Latvijai specifisko pārmaiņu no visām valstīm kopīgās, un tikai specifisko daļu var attiecināt uz Latvijas lēmumiem un intervencēm.</p>
+  <div class="chart" data-chart="cikls"></div>
+  <details class="notes"><summary>Sīkāk</summary>
+    <p>Lielākā daļa priekšlikumu ir organizatoriski un metodiski, nevis jaunu pētījumu uzdevumi: datu pieejamība, saite starp gadiem, iepriekš noteikts brīdinājuma slieksnis un fiksēta salīdzinājuma valstu kopa. Paaudžu panelis ar 543 rindām, kur valsts, pētījums un cikls savienots ar dzimšanas gadu un standartkļūdu, un prognožu modeļi jau ir izveidoti un ir nododami. Publiskajos PISA failos Latvijai nav skolas tipa, ir tikai atrašanās vietas strati, tāpēc ģimnāziju jautājumu iespējams pārbaudīt tikai ar papildu LU vai VISC datiem. HBSC atvērtajos failos valodu plūsmas nav nodalāmas; šādu analīzi varētu nodrošināt SPKC nacionālie dati.</p>
+  </details>
+</section>
+
+<!-- 20 -->
+<section class="s" id="s20" data-title="Atrunas">
+  <p class="kicker">20 · Atrunas</p>
+  <h2>Kas secinājumos ir labi pamatots un kur saglabājas lielāka nenoteiktība</h2>
+  <ul>
+    <li><strong>Labāk pamatoti secinājumi:</strong> latviešu valodas plūsmas 2025. gada kritums un tā sadalījums pa rezultātu līmeņiem; 2018. gada instrumenta nobīdes un 2025. gada iesaistes korekcijas novērtējumi ar standartkļūdām; ilgtermiņa signālu efekta lielumi; vēsturisko pārmaiņu diapazons un uz tā balstītie scenāriji.</li>
+    <li><strong>Secinājumi ar lielāku nenoteiktību:</strong> Latvijai specifiskās 2025. gada pārmaiņas lielums, aptuveni 5 vai 8 punkti atkarībā no salīdzinājuma kopas; simptomu dekompozīcija, kas ir jutīga pret divu 2025. gada pazīmju salīdzināmību; PIRLS izmantošana PISA prognozei, jo Latvijas rindā ir tikai 7 secīgi notikumi.</li>
+    <li><strong>Nacionālo darbu</strong> rezultāti starp gadiem nav psihometriski saskaņoti, un 2022./23. gada vērtēšanas režīma maiņa neļauj droši nošķirt prasmes pārmaiņu no vērtēšanas stingrības pārmaiņas.</li>
+    <li><strong>Scenāriji ir aprakstoši, ne cēloņsakarīgi.</strong> “Labākās ceturtdaļas” scenārijs rāda vēsturiski novērotu pārmaiņu tempu, bet nepasaka, kādi pasākumi šo tempu izraisīja.</li>
+    <li><strong>PISA 2029 populācijas sastāvs būs atšķirīgs.</strong> Visi skolēni mācīsies latviešu valodā, tāpēc 2025. un 2029. gada valsts vidējais nav interpretējams kā pilnīgi nemainīgas populācijas salīdzinājums. Turklāt PISA 2025 ESCS nav pilnībā salīdzināms ar iepriekšējiem cikliem.</li>
+    <li><strong>HBSC 2021/22</strong> analīzē izmantoti pārlūka apkopojumi; atvērtajos mikrodatos valodu plūsmas nav nodalāmas.</li>
+  </ul>
+</section>
+
+<!-- 21 -->
+<section class="s" id="s21" data-title="Avoti">
+  <p class="kicker">21 · Avoti un atkārtojamība</p>
+  <h2>Dati, skripti un dokumenti</h2>
+  <table>
+    <thead><tr><th>Tēma</th><th>Dokuments projektā</th><th>Skripts</th></tr></thead>
+    <tbody>
+      <tr><td>Pilns kopsavilkums un validācija</td><td>docs/62</td><td></td></tr>
+      <tr><td>Koriģētā rinda 2003 līdz 2025</td><td>docs/67, 51, 54, 55</td><td>R/pisa2025/72</td></tr>
+      <tr><td>Ex ante prognozes no rindas</td><td>docs/60</td><td>R/pisa2025/63</td></tr>
+      <tr><td>Agrīnie signāli, efekta lielumi, vizualizācijas</td><td>docs/58, 63, 42, 41</td><td>R/pisa2025/55 līdz 61, 68, 70</td></tr>
+      <tr><td>Simptomu, paaudžu un dinamiskais faktoru modelis</td><td>docs/61, 73</td><td>R/pisa2025/64a līdz 64m, 67a līdz 67d</td></tr>
+      <tr><td>Nacionālie darbi (VIAA, VISC)</td><td>docs/75, 81</td><td>R/pisa2025/79, 81</td></tr>
+      <tr><td>TALIS 2013 līdz 2024</td><td>docs/72</td><td>R/pisa2025/77, 77b</td></tr>
+      <tr><td>Izdevumi uz skolēnu</td><td>docs/65</td><td>R/pisa2025/71</td></tr>
+      <tr><td>HBSC paaudzes</td><td>docs/78</td><td>R/pisa2025/65c</td></tr>
+      <tr><td>Robežjosla, atgriešanās horizonts, scenāriji, ieteikums IZM</td><td>docs/84, 85, 86, 87</td><td>R/pisa2025/83, 83b, 84, 84b</td></tr>
+      <tr><td>Šī lapa</td><td>docs/89</td><td>py/zinojums_prognozes_html.py, R/pisa2025/86_zinojums_*</td></tr>
+    </tbody>
+  </table>
+  <p class="src">Datu avoti: OECD PISA 2000 līdz 2025 mikrodati un PISA 2025 Results Volume I B1 pielikums; OECD TALIS 2013, 2018 un 2024; OECD PIAAC 2023; OECD Education at a Glance; IEA PIRLS 2001 līdz 2021, TIMSS 2003 līdz 2023, ICCS 2009 līdz 2022 un ICILS 2023; HBSC Open Access Data Files 2001/02 līdz 2017/18 un HBSC Data Browser 2021/22; VIAA valsts pārbaudes darbu statistika 2008./09. līdz 2024./25. Efekta lielumu interpretācijas etaloni: Kraft (2020), Educational Researcher 49(4); Bloom, Hill, Black un Lipsey (2008), JREE 1(4); OECD PISA 2022 Results Volume I, Box I.5.1.</p>
+  <p class="small">Tastatūras vadība: bultiņas vai atstarpes taustiņš pārvieto starp sadaļām; P ieslēdz prezentācijas režīmu; N atver sadaļu “Sīkāk”; + pievieno nākamo slāni tekošās sadaļas grafikam; Home atgriež sākumā.</p>
+</section>
+
+<!-- 22 -->
+<section class="s" id="s22" data-title="Termini">
+  <p class="kicker">22 · Saīsinājumi un termini</p>
+  <h2>Ko nozīmē tekstā un grafikos lietotie saīsinājumi</h2>
+  <div class="two">
+    <div>
+      <h3>Pētījumi un iestādes</h3>
+      <ul>
+        <li><strong>PISA</strong>: OECD Starptautiskā skolēnu novērtēšanas programma, 15 gadus veci skolēni, reizi 3 līdz 4 gados.</li>
+        <li><strong>PIRLS</strong>: IEA starptautiskais lasītprasmes pētījums 4. klasē, reizi 5 gados. <strong>TIMSS</strong>: IEA matemātikas un dabaszinātņu pētījums 4. un 8. klasē. <strong>ICCS</strong>: IEA pilsoniskās izglītības pētījums 8. klasē. <strong>ICILS</strong>: IEA datorpratības pētījums 8. klasē. <strong>IEA</strong>: Starptautiskā izglītības sasniegumu novērtēšanas asociācija.</li>
+        <li><strong>PIAAC</strong>: OECD pieaugušo prasmju pētījums, 16 līdz 65 gadi. <strong>TALIS</strong>: OECD starptautiskais mācīšanas un mācīšanās pētījums, skolotāju un direktoru aptauja.</li>
+        <li><strong>HBSC</strong>: Pasaules Veselības organizācijas skolēnu veselības paradumu pētījums 11, 13 un 15 gadu vecumā; Latvijā to veic <strong>SPKC</strong>, Slimību profilakses un kontroles centrs.</li>
+        <li><strong>IZM</strong>: Izglītības un zinātnes ministrija. <strong>VIAA</strong>: Valsts izglītības attīstības aģentūra. <strong>VISC</strong>: Valsts izglītības satura centrs (līdz 2024. gadam). <strong>LU PPMF IPI</strong>: Latvijas Universitātes Pedagoģijas, psiholoģijas un mākslas fakultātes Izglītības pētniecības institūts, PISA nacionālais centrs Latvijā.</li>
+        <li><strong>OECD-23</strong>: 23 OECD valstu vidējais, ko OECD lieto salīdzināšanai visos PISA ciklos. <strong>ISCED 2</strong>: pamatskolas otrais posms, Latvijā 7. līdz 9. klase. <strong>NAP 2034</strong>: Nacionālais attīstības plāns līdz 2034. gadam. <strong>ESF</strong>: Eiropas Sociālais fonds.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Statistikas termini</h3>
+      <ul>
+        <li><strong>Kompetences līmenis</strong>: PISA skalas iedalījums; zem 2. līmeņa ir skolēni, kas nesasniedz pamatprasmes, 5. un 6. līmenis ir augstākais sniegums.</li>
+        <li><strong>Procentile (P5, P10, P50, P90, P95)</strong>: rezultāts, zem kura ir attiecīgā daļa skolēnu (P10: vājākie 10 %). Scenārijos P10 līdz P95 ir vēsturisko pārmaiņu sadalījuma kvantiles.</li>
+        <li><strong>SE, standartkļūda</strong>: aplēses nenoteiktības mērs; 95 % ticamības intervāls ir aptuveni ± 2 SE. <strong>SD, standartnovirze</strong>: rezultātu izkliede; PISA skolēnu SD ir ap 80 līdz 90 punkti. <strong>z</strong>: novirze no vidējā standartnovirzes vienībās.</li>
+        <li><strong>d, h</strong>: efekta lielumi; d ir starpība skolēnu SD vienībās, Koena h ir proporciju starpības mērs. <strong>RR</strong>: relatīvais risks, proporciju attiecība. <strong>pp</strong>: procentpunkti.</li>
+        <li><strong>Iespējamās vērtības (PV, plausible values)</strong>: PISA katram skolēnam dod 10 statistiski ģenerētas rezultāta vērtības, nevis vienu punktu skaitu; visi vidējie un to kļūdas rēķināti ar tām. <strong>BRR</strong>: replikātsvaru metode standartkļūdām, ko lieto OECD. <strong>IRT</strong>: uzdevumu atbilžu teorija, ar ko dažādu gadu testus saliek vienā skalā. <strong>DIF</strong>: uzdevumu atšķirīga darbība dažādās grupās.</li>
+        <li><strong>ESCS</strong>: PISA sociālekonomiskā un kultūras statusa indekss (vecāku izglītība, profesija, mājas resursi). <strong>HOMEPOS</strong>: mājas resursu indekss. <strong>ICC</strong>: starpskolu dispersijas daļa.</li>
+        <li><strong>Saites kļūda</strong>: nenoteiktība, kas rodas, saliekot divu ciklu testus vienā skalā; pieskaitāma starpciklu pārmaiņu kļūdai.</li>
+        <li><strong>Ex ante</strong>: prognoze tikai ar datiem, kas bija pieejami pirms notikuma. <strong>Robežjosla</strong>: vēsturiski novēroto pārmaiņu diapazons valstīm līdzīgā līmenī.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+const DATA = {{DATA}};
+</script>
+<script>
+{{JS_DZINEJS}}
+</script>
+<script>
+{{JS_GRAFIKI}}
+</script>
+<script>
+(function(){
+  const secs = Array.prototype.slice.call(document.querySelectorAll('section.s'));
+  const toc = document.getElementById('toc');
+  secs.forEach((s, i) => {
+    const a = document.createElement('a'); a.href = '#' + s.id; a.textContent = (i === 0 ? '0' : String(i)) + ' ' + (s.getAttribute('data-title') || ''); toc.appendChild(a);
+    if (i) { const k = s.querySelector('.kicker'); if (k) { const t = document.createElement('a'); t.className = 'top'; t.href = '#toc'; t.textContent = 'Uz sākumu'; k.appendChild(t); } }
+  });
+  const body = document.body, root = document.documentElement;
+  const bPrez = document.getElementById('bPrez'), bNotes = document.getElementById('bNotes'), bTheme = document.getElementById('bTheme');
+  const pos = document.getElementById('pos'), prog = document.getElementById('progress');
+  function setPressed(b, on){ b.setAttribute('aria-pressed', on ? 'true' : 'false'); b.blur(); }
+  bPrez.addEventListener('click', () => { const on = !body.classList.contains('prez'); body.classList.toggle('prez', on); setPressed(bPrez, on); });
+  bNotes.addEventListener('click', () => { const on = !body.classList.contains('notes'); body.classList.toggle('notes', on); setPressed(bNotes, on); document.querySelectorAll('details.notes').forEach(d => { d.open = on; }); });
+  bTheme.addEventListener('click', () => { const dark = root.getAttribute('data-theme') !== 'dark'; root.setAttribute('data-theme', dark ? 'dark' : 'light'); setPressed(bTheme, dark); bTheme.textContent = dark ? 'Gaišs' : 'Tumšs'; });
+  document.getElementById('bTop').addEventListener('click', e => { e.preventDefault(); if (body.classList.contains('prez')) { body.classList.remove('prez'); setPressed(bPrez, false); } window.scrollTo({ top: 0, behavior: 'auto' }); });
+  function current(){ const y = window.scrollY + 120; let idx = 0; for (let i = 0; i < secs.length; i++){ if (secs[i].offsetTop <= y) idx = i; } return idx; }
+  function update(){ const i = current(); pos.textContent = i + ' / ' + (secs.length - 1); const h = document.documentElement.scrollHeight - window.innerHeight; prog.style.width = (h > 0 ? (window.scrollY / h * 100) : 0) + '%'; }
+  window.addEventListener('scroll', update, {passive:true}); window.addEventListener('resize', update); update();
+  function go(i){ i = Math.max(0, Math.min(secs.length - 1, i)); secs[i].scrollIntoView({behavior:'auto', block:'start'}); }
+  // Enkuru saites ritina ar skriptu: data: un sandbox dokumentos adreses enkurs nedarbojas
+  document.addEventListener('click', e => {
+    const a = e.target && e.target.closest ? e.target.closest('a[href^="#"]') : null; if (!a) return;
+    const id = a.getAttribute('href').slice(1); const t = id ? document.getElementById(id) : null; if (!t) return;
+    e.preventDefault(); if (body.classList.contains('prez') && id === 'toc') { body.classList.remove('prez'); setPressed(bPrez, false); }
+    t.scrollIntoView({behavior:'auto', block:'start'}); try { history.replaceState(null, '', '#' + id); } catch (err) {}
+  });
+  document.addEventListener('keydown', e => {
+    const tg = e.target && e.target.tagName; if (tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT') return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || (e.key === ' ' && body.classList.contains('prez'))){ e.preventDefault(); go(current() + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); go(current() - 1); }
+    else if (e.key === 'Home'){ e.preventDefault(); go(0); }
+    else if (e.key === 'End'){ e.preventDefault(); go(secs.length - 1); }
+    else if (e.key === 'n' || e.key === 'N'){ const d = secs[current()].querySelector('details.notes'); if (d) d.open = !d.open; }
+    else if (e.key === 'p' || e.key === 'P'){ bPrez.click(); }
+    else if (e.key === '+' || e.key === '='){ const c = secs[current()].querySelector('.chart'); if (c && c.pzNext) c.pzNext(); else { const b = secs[current()].querySelector('.pz-plus'); if (b) b.click(); } }
+  });
+  GRAFIKI.init(DATA);
+})();
+</script>
+</body>
+</html>

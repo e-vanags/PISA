@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PISA mainīgo atlants</title>
+<meta name="description" content="Visi PISA 2000–2025 anketu mainīgie Latvijai un 7 salīdzinājuma valstīm: meklēšana, filtri, ciklu matrica, lietojums mūsu modeļos.">
+<style>
+:root { --fons: #fbfaf7; --teksts: #1d1d1b; --pel: #6b6b66; --linija: #dcd9d0; --karte: #ffffff; --akc: #1f5fa8; --akc2: #b3261e; --zal: #0f8a6e; --dzelt: #fff4d6; --mono: ui-monospace, Menlo, Consolas, monospace; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fons: #17181a; --teksts: #ebe9e3; --pel: #a4a39c; --linija: #34363a; --karte: #202225; --akc: #7fb0f0; --akc2: #f28b82; --zal: #5fd3b0; --dzelt: #3a3320; } }
+:root[data-theme="dark"] { --fons: #17181a; --teksts: #ebe9e3; --pel: #a4a39c; --linija: #34363a; --karte: #202225; --akc: #7fb0f0; --akc2: #f28b82; --zal: #5fd3b0; --dzelt: #3a3320; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fons); color: var(--teksts); font: 15px/1.45 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+.lapa { max-width: 1500px; margin: 0 auto; padding: 20px 16px 60px; }
+h1 { font-size: 24px; margin: 0 0 6px; }
+h2 { font-size: 17px; margin: 22px 0 8px; }
+p { max-width: 900px; }
+.pel { color: var(--pel); }
+.karte { background: var(--karte); border: 1px solid var(--linija); border-radius: 8px; padding: 12px 14px; }
+.kops { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
+.kops .sk { font-size: 24px; font-weight: 600; }
+.kops .n { font-size: 12px; color: var(--pel); }
+.filtri { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: end; margin: 12px 0; }
+.filtri label { display: flex; flex-direction: column; font-size: 12px; color: var(--pel); gap: 2px; }
+.filtri input, .filtri select { font: inherit; padding: 5px 7px; border: 1px solid var(--linija); border-radius: 6px; background: var(--karte); color: var(--teksts); min-width: 120px; }
+.filtri input[type="search"] { min-width: 260px; }
+.filtri .chk { flex-direction: row; align-items: center; gap: 6px; padding-bottom: 6px; }
+.skaits { margin: 6px 0 10px; font-size: 13px; color: var(--pel); }
+.izk { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 14px; }
+@media (max-width: 1000px) { .izk { grid-template-columns: 1fr; } .det { position: static !important; } }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { text-align: left; padding: 5px 7px; border-bottom: 1px solid var(--linija); vertical-align: top; }
+th { position: sticky; top: 0; background: var(--karte); font-weight: 600; cursor: pointer; white-space: nowrap; }
+th.sortAsc::after { content: " ▲"; font-size: 10px; } th.sortDesc::after { content: " ▼"; font-size: 10px; }
+tbody tr { cursor: pointer; } tbody tr:hover { background: var(--dzelt); } tbody tr.akt { outline: 2px solid var(--akc); outline-offset: -2px; }
+td.mono, .mono { font-family: var(--mono); letter-spacing: 1px; white-space: nowrap; }
+td.etik { max-width: 520px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tab-wrap { overflow-x: auto; max-height: 75vh; overflow-y: auto; border: 1px solid var(--linija); border-radius: 8px; background: var(--karte); }
+.zime { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 10px; border: 1px solid var(--linija); margin-right: 3px; white-space: nowrap; }
+.zime.ja { border-color: var(--zal); color: var(--zal); } .zime.ne { color: var(--pel); }
+.det { position: sticky; top: 10px; align-self: start; max-height: 92vh; overflow-y: auto; }
+.det h3 { margin: 0 0 4px; font-size: 16px; font-family: var(--mono); }
+.det dl { display: grid; grid-template-columns: 110px 1fr; gap: 4px 8px; margin: 8px 0; font-size: 13px; }
+.det dt { color: var(--pel); } .det dd { margin: 0; overflow-wrap: anywhere; }
+.det ul { padding-left: 18px; margin: 4px 0; font-size: 13px; }
+.det .vert { font-size: 12px; }
+button { font: inherit; padding: 6px 12px; border: 1px solid var(--linija); border-radius: 6px; background: var(--karte); color: var(--teksts); cursor: pointer; }
+button:hover { border-color: var(--akc); }
+.legenda { font-size: 12px; color: var(--pel); margin: 6px 0; }
+details { margin: 8px 0; } summary { cursor: pointer; }
+.ktab td, .ktab th { font-size: 12px; padding: 3px 6px; }
+</style>
+</head>
+<body>
+<div class="lapa">
+<h1>PISA mainīgo atlants 2000–2025</h1>
+<p class="pel" id="apaksvirsraksts"></p>
+
+<div class="karte">
+<p><strong>Kas tas ir.</strong> Viena rinda katram mainīgajam katrā PISA ciklā, kurā Latvija piedalījās (2000, 2003, 2006, 2009, 2012, 2015, 2018, 2022, 2025): skolēnu anketa (arī vecāku, IKT, labbūtības, finanšu pratības moduļi, kas 2015. gadā un vēlāk ir skolēnu failā), skolas anketa un skolotāju anketa (Latvija tajā nav piedalījusies, tāpēc tai ir tikai salīdzinājuma valstu derīgums). Katram mainīgajam ir oriģinālā etiķete, tips, vērtību etiķetes, derīgo atbilžu daļa Latvijā un 7 salīdzinājuma valstīs (EST, LTU, POL, FIN, CZE, HUN, DEU), automātiska tēma pēc atslēgvārdiem, saskaņotais konstrukts ar ciklu klātbūtnes matricu (● ir, · nav; kārtība 2000 … 2025) un karodziņi, vai mainīgais vai tā konstrukts ir lietots mūsu skriptos: 64h (reducēto pazīmju simptomu modelis), 69a/69f (citi iznākumi), 69c/75 (tīkli), 67d (dinamiskais faktoru modelis), 58 (agrie signāli), citur.</p>
+<p><strong>Kā lietot.</strong> Meklēšana pēc koda vai etiķetes vārda (piem. <span class="mono">ST154</span>, <span class="mono">pages</span>, <span class="mono">library</span>). Filtri sašaurina pēc cikla, faila, anketas, tēmas, tipa, ciklu skaita, harmonizācijas veida un lietojuma. Klikšķis uz kolonnas virsraksta kārto; klikšķis uz rindas atver detaļas labajā pusē: pilna etiķete, vērtību etiķetes, derīgums, konstrukta locekļi visos ciklos un skripti, kuros tas lietots. Noklusējumā tehniskie mainīgie (ID, svari, ticamās vērtības, dizains) ir paslēpti.</p>
+<p><strong>Piesardzība.</strong> Konstruktu saskaņošana ir automātiska (manuālā karte no 64d, tad vienāds nosaukums ar etiķetes pārbaudi, tad etiķetes vārdu līdzība ≥ 0,6); tā ir pirmais piegājiens, ne galīga harmonizācija. Tēma ir noteikta pēc atslēgvārdiem angliskajā etiķetē, tāpēc robežgadījumos var būt neprecīza. Lietojuma karodziņš "citur" nāk no koda meklēšanas visos skriptos, ne no izlasīšanas: mainīgais var būt lietots tikai pārbaudei, ne modelī.</p>
+</div>
+
+<div class="kops" id="kops"></div>
+
+<details><summary>Kopsavilkums pa cikliem un failiem (mainīgo skaits, anketas jautājumi, indeksi, viena cikla, lietoti)</summary>
+<div class="tab-wrap" style="max-height:none"><table class="ktab" id="kopsTab"></table></div>
+<p class="legenda">COG, TIM, CRT, COG_PROCESS, TT: kognitīvo, laika un procesa failu mainīgo skaits (tikai skaits, atlantā nav pa vienam).</p>
+</details>
+
+<div class="filtri">
+<label>Meklēt (kods vai etiķete)<input type="search" id="q" placeholder="piem. ST154 vai pages"></label>
+<label>Cikls<select id="fG"><option value="">visi</option></select></label>
+<label>Fails<select id="fF"><option value="">visi</option></select></label>
+<label>Anketa<select id="fA"><option value="">visas</option></select></label>
+<label>Tēma<select id="fT"><option value="">visas</option></select></label>
+<label>Tips<select id="fP"><option value="">visi</option></select></label>
+<label>Ciklu skaits<select id="fC"><option value="">visi</option><option value="1">1 (viena cikla)</option><option value="2-3">2–3</option><option value="4-6">4–6</option><option value="7-9">7–9</option></select></label>
+<label>Harmonizācija<select id="fH"><option value="">visas</option></select></label>
+<label>Lietojums<select id="fU"><option value="">visi</option><option value="1">lietots kaut kur</option><option value="0">nelietots nekur</option><option value="64h">64h</option><option value="69a">69a/69f</option><option value="69c">69c/75</option><option value="67">67d</option><option value="58">58</option><option value="c">citur</option><option value="apv">64e apvienotajā tabulā</option></select></label>
+<label class="chk"><input type="checkbox" id="fS" checked> slēpt tehniskos</label>
+<label class="chk"><input type="checkbox" id="fK"> viens pārstāvis konstruktam</label>
+<button id="notirit">Notīrīt</button>
+<button id="csv">Lejupielādēt filtrēto CSV</button>
+</div>
+<div class="skaits" id="skaits"></div>
+<p class="legenda">Matrica: 2000 2003 2006 2009 2012 2015 2018 2022 2025. Lietojums: <span class="zime ja">64h</span> simptomu modelis, <span class="zime ja">69</span> citi iznākumi, <span class="zime ja">tīkls</span> 69c/75, <span class="zime ja">DFM</span> 67d, <span class="zime ja">58</span> agrie signāli, <span class="zime ja">citur</span> citi skripti.</p>
+
+<div class="izk">
+<div class="tab-wrap">
+<table id="tab">
+<thead><tr>
+<th data-k="g">Cikls</th><th data-k="f">Fails</th><th data-k="v">Mainīgais</th><th data-k="e">Etiķete</th><th data-k="t">Tips</th><th data-k="tm">Tēma</th><th data-k="lv">LVA %</th><th data-k="sl">7 v. %</th><th data-k="ck">Cikli</th><th data-k="m">Matrica</th><th data-k="u">Lietots</th>
+</tr></thead>
+<tbody id="tb"></tbody>
+</table>
+<div style="padding:8px"><button id="vel">Rādīt vēl</button></div>
+</div>
+<div class="karte det" id="det"><p class="pel">Klikšķini uz rindas, lai redzētu detaļas.</p></div>
+</div>
+</div>
+
+<script type="application/json" id="dati">__DATI_JSON__</script>
+<script>
+(function () {
+  var D = JSON.parse(document.getElementById('dati').textContent);
+  var M = D.mainigie, K = D.konstrukti, GADI = D.gadi;
+  var KI = {}; K.forEach(function (k) { KI[k.k] = k; });
+  var $ = function (id) { return document.getElementById(id); };
+  var LAPA = 300, rad = LAPA, kart = { k: 'g', asc: true }, akt = null, filtreti = [];
+
+  document.getElementById('apaksvirsraksts').textContent = 'Izveidots ' + D.meta.datums + '. ' + D.meta.n_main + ' mainīgo rindas, ' +
+    D.meta.n_kon + ' konstrukti. Saturiskie mainīgie (bez ID, svariem, PV, dizaina): ' + D.meta.n_sat + ', no tiem nelietoti nekur ' +
+    D.meta.n_nelietoti + ', viena cikla ' + D.meta.n_viena + '.';
+
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function opc(id, vals) { var s = $(id); vals.forEach(function (v) { var o = document.createElement('option'); o.value = v; o.textContent = v; s.appendChild(o); }); }
+  function uniq(key) { var o = {}; M.forEach(function (r) { o[r[key]] = 1; }); return Object.keys(o).sort(); }
+  opc('fG', GADI); opc('fF', uniq('f')); opc('fA', uniq('an')); opc('fT', uniq('tm')); opc('fP', uniq('t')); opc('fH', uniq('h'));
+
+  var sat = M.filter(function (r) { return ['ID', 'PV', 'svars', 'dizains'].indexOf(r.t) < 0; });
+  var kops = [
+    ['Mainīgo rindas', M.length], ['Saturiskie', sat.length],
+    ['Viena cikla', sat.filter(function (r) { return r.ck === 1; }).length],
+    ['Lietoti kaut kur', sat.filter(function (r) { return r.u === 1; }).length],
+    ['Nelietoti nekur', sat.filter(function (r) { return r.u === 0; }).length],
+    ['Konstrukti', K.length]];
+  $('kops').innerHTML = kops.map(function (k) { return '<div class="karte"><div class="sk">' + k[1] + '</div><div class="n">' + k[0] + '</div></div>'; }).join('');
+
+  var kt = '<thead><tr><th>Cikls</th><th>Fails</th><th>Mainīgie</th><th>Anketas jautājumi</th><th>Indeksi</th><th>Tehniskie</th><th>Viena cikla</th><th>Lietoti</th><th>Nelietoti</th></tr></thead><tbody>';
+  D.kopsavilkums.forEach(function (r) { kt += '<tr><td>' + r.g + '</td><td>' + r.f + '</td><td>' + r.n + '</td><td>' + (r.q == null ? '' : r.q) + '</td><td>' + (r.i == null ? '' : r.i) + '</td><td>' + (r.teh == null ? '' : r.teh) + '</td><td>' + (r.vc == null ? '' : r.vc) + '</td><td>' + (r.l == null ? '' : r.l) + '</td><td>' + (r.nl == null ? '' : r.nl) + '</td></tr>'; });
+  $('kopsTab').innerHTML = kt + '</tbody>';
+
+  function lietZimes(r) {
+    var z = [];
+    if (r.u64h) z.push('64h'); if (r.u69a) z.push('69'); if (r.u69c) z.push('tīkls'); if (r.u67) z.push('DFM'); if (r.u58) z.push('58'); if (r.uc) z.push('citur');
+    if (!z.length) return '<span class="zime ne">nav</span>';
+    return z.map(function (x) { return '<span class="zime ja">' + x + '</span>'; }).join('');
+  }
+  function ck(r) {
+    var c = $('fC').value; if (!c) return true;
+    if (c === '1') return r.ck === 1; if (c === '2-3') return r.ck >= 2 && r.ck <= 3; if (c === '4-6') return r.ck >= 4 && r.ck <= 6; return r.ck >= 7;
+  }
+  function uu(r) {
+    var u = $('fU').value; if (!u) return true;
+    if (u === '1') return r.u === 1; if (u === '0') return r.u === 0; if (u === '64h') return r.u64h === 1; if (u === '69a') return r.u69a === 1;
+    if (u === '69c') return r.u69c === 1; if (u === '67') return r.u67 === 1; if (u === '58') return r.u58 === 1; if (u === 'c') return r.uc === 1; if (u === 'apv') return r.apv === 1; return true;
+  }
+  function filtret() {
+    var q = $('q').value.trim().toLowerCase(), g = $('fG').value, f = $('fF').value, a = $('fA').value, t = $('fT').value, p = $('fP').value, h = $('fH').value,
+      s = $('fS').checked, vk = $('fK').checked, redz = {};
+    filtreti = M.filter(function (r) {
+      if (s && ['ID', 'PV', 'svars', 'dizains'].indexOf(r.t) >= 0) return false;
+      if (g && r.g !== g) return false; if (f && r.f !== f) return false; if (a && r.an !== a) return false; if (t && r.tm !== t) return false;
+      if (p && r.t !== p) return false; if (h && r.h !== h) return false; if (!ck(r) || !uu(r)) return false;
+      if (q && r.v.toLowerCase().indexOf(q) < 0 && r.e.toLowerCase().indexOf(q) < 0 && r.k.toLowerCase().indexOf(q) < 0 && (r.k64 || '').toLowerCase().indexOf(q) < 0 && r.b.toLowerCase().indexOf(q) < 0) return false;
+      if (vk) { if (redz[r.k]) return false; redz[r.k] = 1; }
+      return true;
+    });
+    kartot(); rad = LAPA; zimet();
+  }
+  function kartot() {
+    var k = kart.k, asc = kart.asc ? 1 : -1;
+    filtreti.sort(function (x, y) { var a = x[k], b = y[k]; if (a == null) a = -1; if (b == null) b = -1;
+      if (typeof a === 'number' && typeof b === 'number') return (a - b) * asc; a = String(a); b = String(b); return (a < b ? -1 : a > b ? 1 : 0) * asc; });
+  }
+  function zimet() {
+    var tb = $('tb'), h = '', n = Math.min(rad, filtreti.length);
+    for (var i = 0; i < n; i++) { var r = filtreti[i];
+      h += '<tr data-i="' + i + '"' + (akt === r ? ' class="akt"' : '') + '><td>' + r.g + '</td><td>' + r.f + '</td><td class="mono" style="letter-spacing:0">' + esc(r.v) + '</td><td class="etik" title="' + esc(r.e) + '">' + esc(r.e) + '</td><td>' + r.t + '</td><td>' + r.tm + '</td><td>' + (r.lv == null ? '' : r.lv) + '</td><td>' + (r.sl == null ? '' : r.sl) + '</td><td>' + r.ck + '</td><td class="mono">' + r.m + '</td><td>' + lietZimes(r) + '</td></tr>';
+    }
+    tb.innerHTML = h;
+    $('skaits').textContent = 'Rādīti ' + n + ' no ' + filtreti.length + ' atlasītajām rindām (kopā ' + M.length + ').';
+    $('vel').style.display = n < filtreti.length ? '' : 'none';
+    var ths = document.querySelectorAll('#tab th'); for (var j = 0; j < ths.length; j++) { ths[j].className = ths[j].dataset.k === kart.k ? (kart.asc ? 'sortAsc' : 'sortDesc') : ''; }
+  }
+  function detalas(r) {
+    akt = r; var k = KI[r.k], h = '<h3>' + esc(r.v) + '</h3><div class="pel">' + r.g + ' · ' + r.f + ' · ' + r.an + ' anketa · bloks ' + esc(r.b) + '</div>';
+    h += '<p>' + esc(r.e) + '</p><dl>';
+    h += '<dt>Tips</dt><dd>' + r.t + (r.ns ? ' · valsts specifiska adaptācija &lt;…&gt;' : '') + '</dd>';
+    h += '<dt>Tēma</dt><dd>' + r.tm + '</dd>';
+    h += '<dt>Derīgi LVA</dt><dd>' + (r.lv == null ? 'nav (Latvija nepiedalījās)' : r.lv + ' %') + '</dd>';
+    h += '<dt>Derīgi 7 v.</dt><dd>' + (r.sl == null ? 'nav' : r.sl + ' %') + '</dd>';
+    h += '<dt>Vērtības LVA</dt><dd>' + (r.nv == null ? '' : r.nv + ' atšķirīgas') + '</dd>';
+    h += '<dt>Vērtību etiķetes</dt><dd class="vert">' + (r.ve ? esc(r.ve) : '<span class="pel">nav</span>') + '</dd>';
+    h += '<dt>Konstrukts</dt><dd class="mono" style="letter-spacing:0">' + esc(r.k) + '</dd>';
+    h += '<dt>Harmonizācija</dt><dd>' + r.h + ' · ' + r.ck + ' cikli · <span class="mono">' + r.m + '</span></dd>';
+    if (r.k64) h += '<dt>64d konstrukts</dt><dd class="mono" style="letter-spacing:0">' + esc(r.k64) + (r.apv ? ' (64e apvienotajā tabulā)' : '') + '</dd>';
+    h += '<dt>Lietots</dt><dd>' + lietZimes(r) + '</dd>';
+    if (r.sk) h += '<dt>Skripti</dt><dd class="vert">' + esc(r.sk) + '</dd>';
+    h += '</dl>';
+    if (k) { h += '<h2 style="margin-top:10px">Konstrukta locekļi pa cikliem</h2><ul>';
+      GADI.forEach(function (g) { var v = k['v' + g]; if (v) h += '<li><span class="pel">' + g + '</span> <span class="mono" style="letter-spacing:0">' + esc(v) + '</span></li>'; });
+      h += '</ul><p class="pel" style="font-size:12px">Konstrukta etiķete (jaunākais cikls): ' + esc(k.e) + '</p>'; }
+    $('det').innerHTML = h; zimet();
+  }
+  $('tb').addEventListener('click', function (ev) { var tr = ev.target.closest('tr'); if (!tr) return; detalas(filtreti[+tr.dataset.i]); });
+  document.querySelectorAll('#tab th').forEach(function (th) { th.addEventListener('click', function () { var k = th.dataset.k; if (kart.k === k) kart.asc = !kart.asc; else { kart.k = k; kart.asc = true; } kartot(); zimet(); }); });
+  ['q', 'fG', 'fF', 'fA', 'fT', 'fP', 'fC', 'fH', 'fU', 'fS', 'fK'].forEach(function (id) { $(id).addEventListener('input', filtret); $(id).addEventListener('change', filtret); });
+  $('vel').addEventListener('click', function () { rad += LAPA; zimet(); });
+  $('notirit').addEventListener('click', function () { ['q', 'fG', 'fF', 'fA', 'fT', 'fP', 'fC', 'fH', 'fU'].forEach(function (id) { $(id).value = ''; }); $('fS').checked = true; $('fK').checked = false; filtret(); });
+  $('csv').addEventListener('click', function () {
+    var kol = ['g', 'f', 'an', 'v', 'e', 't', 'b', 'tm', 'lv', 'sl', 'nv', 've', 'k', 'ck', 'm', 'h', 'k64', 'u64h', 'u69a', 'u69c', 'u67', 'u58', 'uc', 'u', 'sk'];
+    var nos = ['gads', 'fails', 'anketa', 'mainigais', 'etikete', 'tips', 'bloks', 'tema', 'lva_derigi_pct', 'sal_derigi_pct', 'lva_vertibu_skaits', 'vertibu_etiketes', 'konstrukts', 'ciklu_skaits', 'matrica', 'harmonizacija', 'konstrukts_64d', 'lietots_64h', 'lietots_69a_f', 'lietots_69c_75', 'lietots_67d', 'lietots_58', 'lietots_citur', 'lietots', 'lietots_skripti'];
+    var q = function (s) { s = String(s == null ? '' : s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+    var t = nos.join(',') + '\n' + filtreti.map(function (r) { return kol.map(function (c) { return q(r[c]); }).join(','); }).join('\n');
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + t], { type: 'text/csv;charset=utf-8' })); a.download = 'atlants_filtrets.csv'; a.click();
+  });
+  filtret();
+})();
+</script>
+</body>
+</html>

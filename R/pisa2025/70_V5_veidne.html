@@ -1,0 +1,134 @@
+<!doctype html><html lang="lv"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Paaudžu trajektorija</title>
+<style>
+:root{--ink:#1a1a1a;--muted:#5a5a56;--line:#dcdcd5;--bg:#fbfbf8;--card:#fff;--pisa:#111;--pirls:#2a78d6;--timss:#e0641f;--iccs:#0f8a6e;--piaac:#7a57c7;--model:#b3261e;--ref:#8a8a84}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.45}
+.wrap{max-width:1120px;margin:0 auto;padding:22px 20px 40px}
+h1{font-size:22px;margin:0 0 6px;letter-spacing:-.01em}
+.lede{font-size:15px;color:var(--ink);max-width:78ch;margin:0 0 14px}
+.lede b{color:var(--model)}
+.kalasit{background:#f1f5fb;border:1px solid #d4e0f2;border-radius:6px;padding:10px 16px;margin:0 0 14px;font-size:13.5px}
+.kalasit summary{cursor:pointer;font-weight:600;font-size:14px}
+.kalasit ul{margin:6px 0 2px 18px;padding:0}
+.kalasit li{margin:3px 0}
+.bar{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;margin:0 0 10px;font-size:13.5px}
+.seg{display:inline-flex;border:1px solid #bbb;border-radius:6px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:6px 12px;font:inherit;cursor:pointer;color:#333}
+.seg button.on{background:#333;color:#fff}
+select{font:inherit;padding:4px 6px}
+.hint{color:var(--muted);font-size:12.5px}
+.adv{font-size:13px;margin:0 0 10px}
+.adv summary{cursor:pointer;color:var(--muted)}
+.adv label{margin-right:14px;display:inline-flex;gap:4px;align-items:center}
+svg{width:100%;height:auto;background:var(--card);border:1px solid var(--line);border-radius:4px}
+.fakti{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:14px 0 6px}
+.f{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.f .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.f .v{font-size:22px;font-weight:600;margin:2px 0;font-variant-numeric:tabular-nums}
+.f .d{font-size:12.5px;color:var(--muted)}
+h2{font-size:16px;margin:26px 0 6px}
+p.x{font-size:13.5px;color:var(--ink);max-width:90ch;margin:4px 0 10px}
+table{font-size:13px;border-collapse:collapse;margin-top:6px;font-variant-numeric:tabular-nums}
+td,th{padding:4px 10px;border-bottom:1px solid var(--line);text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;background:#f4f4f0}
+td.ok{color:var(--iccs)}td.no{color:var(--model)}
+.foot{font-size:12px;color:var(--muted);margin-top:18px;max-width:100ch}
+.tip{position:absolute;pointer-events:none;background:#222;color:#fff;font-size:12.5px;padding:6px 9px;border-radius:4px;max-width:300px;display:none;z-index:9}
+</style></head><body><div class="wrap">
+<h1>Cik paaudzes bija zem salīdzinājuma valstīm, un kopš kura laika?</h1>
+<p class="lede">Katrs punkts ir <b>viena paaudze</b> (dzimšanas gads), izmērīta vienā pētījumā. Augstums rāda, cik punktus latviešu valodas plūsma bija <b>virs vai zem</b> 7 salīdzinājuma valstu vidējā (Igaunija, Lietuva, Somija, Polija, Čehija, Ungārija, Vācija) tajā pašā pētījumā. Sarkanā līkne ir modeļa labākā aplēse par paaudzes relatīvo līmeni, savienojot visus mērījumus.</p>
+<details class="kalasit" open><summary>Kā lasīt šo grafiku</summary><ul>
+<li><b>Apakšējā ass</b> — dzimšanas gads (paaudze). <b>Augšējā ass</b> — gads, kurā šī paaudze kārtoja PISA (15 gadu vecumā). Vertikālās svītrlīnijas savieno abas.</li>
+<li><b>Nulles līnija</b> = tikpat, cik 7 valstu vidējais. Zem tās — sliktāk, virs — labāk. Vienības ir tā pētījuma punkti (PISA un IEA skalām SD ≈ 100, tāpēc 10 punkti ≈ 0,1 SD).</li>
+<li><b>Punkti pēc formas un krāsas</b>: ● PISA (15 g.), ■ PIRLS (4. klase), ■ TIMSS (4. klase), ■ ICCS/ICILS (8. klase), ◆ PIAAC (pieaugušie 2023. gadā, pēc dzimšanas gada). Svītra caur punktu — 95 % ticamības intervāls.</li>
+<li><b>Sarkanā līkne un josla</b> — stāvokļa telpas modelis (vienmērīga trajektorija pa paaudzēm, kas izlīdzina mērījumu troksni); josla — modeļa 95 % nenoteiktība. Līkne zīmēta tikai tur, kur ir mērījumi.</li>
+<li>Uzbrauc uz punkta — parādās paskaidrojums vārdos.</li></ul></details>
+<div class="bar">
+<span class="seg" id="skats"><button data-v="rel" class="on">Relatīvi pret 7 valstīm</button><button data-v="abs">Absolūtie PISA punkti</button></span>
+<label>Valsts: <select id="grp"></select></label>
+<label>7 valstu atskaite: <select id="kopa"><option value="visi skolēni">visi skolēni</option><option value="galvenā valoda">tikai galvenās mājas valodas skolēni</option></select></label>
+<span class="hint" id="kopahint">Latvijai ņemta tikai latviešu valodas plūsma, tāpēc simetriskāk ir salīdzināt ar citu valstu galvenās valodas skolēniem.</span>
+</div>
+<details class="adv"><summary>Papildu iespējas (modeļa varianti, mērījumu rādīšana)</summary>
+<label><input type="checkbox" class="v" value="PISA + PIRLS" checked> līkne: PISA + PIRLS (pamatvariants)</label>
+<label><input type="checkbox" class="v" value="tikai PISA"> līkne: tikai PISA</label>
+<label><input type="checkbox" class="v" value="visi pētījumi"> līkne: visi pētījumi</label>
+<label><input type="checkbox" id="mer" checked> rādīt mērījumus</label>
+<label><input type="checkbox" id="josla" checked> rādīt 95 % joslu</label>
+<label><input type="checkbox" id="anot" checked> rādīt paskaidrojumus grafikā</label></details>
+<div style="position:relative"><svg id="s" viewBox="0 0 1120 640"></svg><div class="tip" id="tip"></div></div>
+<div class="fakti" id="fakti"></div>
+<h2>Vai to varēja paredzēt pirms katra PISA cikla?</h2>
+<p class="x" id="progn_x">Tabulā — ko modelis būtu <b>paredzējis pirms</b> katra PISA cikla, lietojot tikai līdz tam publicētos mērījumus (ex ante), pret to, kas notika. Vērtības ir relatīvās pārmaiņas pret iepriekšējo ciklu (punkti pret 7 valstīm). Zaļš — prognozes virziens sakrīt ar faktisko, sarkans — nesakrīt.</p>
+<table id="t"></table>
+<p class="foot" id="foot"></p>
+</div>
+<script>
+const D=__JSDATA__;
+const W=1120,H=640,m={l:64,r:24,t:64,b:66};
+const svg=document.getElementById("s"),tip=document.getElementById("tip");
+const C={pisa:"#111",pirls:"#2a78d6",timss:"#e0641f",iccs:"#0f8a6e",piaac:"#7a57c7",model:"#b3261e",ref:"#8a8a84"};
+const VCOL={"PISA + PIRLS":C.model,"tikai PISA":"#8a8a84","visi pētījumi":"#0f8a6e"};
+const NOS={CZE:"Čehija",DEU:"Vācija",EST:"Igaunija",FIN:"Somija",HUN:"Ungārija",LTU:"Lietuva",POL:"Polija","LVA A":"Latvija — latviešu valodas plūsma"};
+const sel=document.getElementById("grp");D.valstis.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=NOS[v]||v;if(v==="LVA A")o.selected=true;sel.appendChild(o)});
+let skats="rel";document.querySelectorAll("#skats button").forEach(b=>b.addEventListener("click",()=>{skats=b.dataset.v;document.querySelectorAll("#skats button").forEach(x=>x.classList.toggle("on",x===b));draw()}));
+const kind=p=>/PISA/.test(p)?"pisa":/PIRLS/.test(p)?"pirls":/TIMSS/.test(p)?"timss":/PIAAC/.test(p)?"piaac":"iccs";
+const f1=x=>(x>0?"+":"")+String(Math.round(x*10)/10).replace(".",",");
+const xs=b=>m.l+(b-1984)/(2014-1984)*(W-m.l-m.r);
+function axes(ys,yt,ylab){let s="";
+yt.forEach(y=>{s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${ys(y)}" y2="${ys(y)}" stroke="${y===0?"#333":"#e6e6e0"}" stroke-width="${y===0?1.4:1}"/><text x="${m.l-8}" y="${ys(y)+4}" font-size="11.5" text-anchor="end" fill="#555">${y>0&&ylab==="rel"?"+":""}${y}</text>`});
+for(let b=1984;b<=2014;b+=2)s+=`<text x="${xs(b)}" y="${H-m.b+18}" font-size="11.5" text-anchor="middle" fill="#555">${b}</text>`;
+[2000,2003,2006,2009,2012,2015,2018,2022,2025].forEach(c=>{s+=`<line x1="${xs(c-16)}" x2="${xs(c-16)}" y1="${m.t}" y2="${H-m.b}" stroke="#dedcd4" stroke-dasharray="3,4"/><text x="${xs(c-16)}" y="${m.t-8}" font-size="11.5" text-anchor="middle" fill="#555">${c}</text>`});
+s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${m.t}" y2="${m.t}" stroke="#999"/><text x="${(m.l+W-m.r)/2}" y="${m.t-26}" font-size="12" text-anchor="middle" fill="#333" font-weight="600">PISA mērījuma gads (paaudze 15 gadu vecumā)</text>`;
+s+=`<line x1="${m.l}" x2="${W-m.r}" y1="${H-m.b}" y2="${H-m.b}" stroke="#999"/><text x="${(m.l+W-m.r)/2}" y="${H-m.b+46}" font-size="12" text-anchor="middle" fill="#333" font-weight="600">Dzimšanas gads (paaudze)</text>`;
+s+=`<text transform="translate(16,${(m.t+H-m.b)/2}) rotate(-90)" font-size="12" text-anchor="middle" fill="#333" font-weight="600">${ylab==="rel"?"Punkti virs (+) vai zem (−) 7 valstu vidējā":"PISA lasīšanas punkti"}</text>`;
+return s}
+function legend(items,x,y){let s=`<rect x="${x}" y="${y}" width="250" height="${14+items.length*17}" fill="#fff" fill-opacity=".92" stroke="#ddd"/>`;items.forEach((it,i)=>{const yy=y+16+i*17;s+=it.shape==="line"?`<line x1="${x+8}" x2="${x+28}" y1="${yy-4}" y2="${yy-4}" stroke="${it.c}" stroke-width="2.4" ${it.dash?'stroke-dasharray="6,4"':""}/>`:it.shape==="rect"?`<rect x="${x+13}" y="${yy-9}" width="10" height="10" fill="${it.c}"/>`:it.shape==="diam"?`<polygon points="${x+18},${yy-10} ${x+24},${yy-4} ${x+18},${yy+2} ${x+12},${yy-4}" fill="${it.c}"/>`:`<circle cx="${x+18}" cy="${yy-4}" r="5" fill="${it.c}"/>`;s+=`<text x="${x+36}" y="${yy}" font-size="11.5" fill="#333">${it.t}</text>`});return s}
+function ptTip(r,kp){const k=kind(r.petijums);const kur=k==="pisa"?"15 gadu vecumā":k==="piaac"?`pieaugušo vecumā (${r.vecums} g., 2023)`:/TIMSS|PIRLS/.test(r.petijums)?"4. klasē":"8. klasē";
+const nos=r.petijums.replace("TIMSS4","TIMSS").replace(" lasīšana","");return `${nos} ${r.gads} — paaudze dz. ${Math.round(r.dz_gads)}, mērīta ${kur}: ${f1(r.rel)} punkti pret 7 valstu vidējo${k==="pisa"?" ("+kp+")":""}, ±${f1(1.96*r.se).replace("+","")} (95 %)`}
+function drawRel(){const g=sel.value,kp=document.getElementById("kopa").value;const vs=[...document.querySelectorAll(".v:checked")].map(e=>e.value);
+const ys=v=>m.t+(40-v)/90*(H-m.t-m.b);let s=axes(ys,[-50,-40,-30,-20,-10,0,10,20,30,40],"rel");
+const T=D.trajektorija.filter(r=>r.grupa===g&&vs.includes(r.variants));
+vs.forEach(v=>{const t=T.filter(r=>r.variants===v);if(!t.length)return;const c=VCOL[v];if(document.getElementById("josla").checked)s+=`<path d="M${t.map(r=>xs(r.b)+","+ys(r.rel+1.96*r.se)).join("L")}L${t.slice().reverse().map(r=>xs(r.b)+","+ys(r.rel-1.96*r.se)).join("L")}Z" fill="${c}" opacity=".11"/>`;
+s+=`<path d="M${t.map(r=>xs(r.b)+","+ys(r.rel)).join("L")}" fill="none" stroke="${c}" stroke-width="${v==="PISA + PIRLS"?2.6:1.8}" ${v==="PISA + PIRLS"?"":'stroke-dasharray="5,4"'}/>`});
+const pts=[];
+if(document.getElementById("mer").checked&&g==="LVA A"){D.merijumi.forEach(r0=>{const r=Object.assign({},r0);if(kind(r.petijums)==="pisa"&&kp==="galvenā valoda"){const own=D.absol.find(q=>q.grupa==="LVA A"&&q.gads==r.gads);const rf=D.kopa7.find(q=>q.kopa===kp&&q.gads==r.gads);if(own&&rf)r.rel=Math.round((own.est-rf.est)*10)/10}
+if(r.dz_gads<1984||r.dz_gads>2014)return;const k=kind(r.petijums),c=C[k],x=xs(r.dz_gads),y=ys(r.rel);pts.push(Object.assign({x,y},r));
+s+=`<line x1="${x}" x2="${x}" y1="${ys(r.rel-1.96*r.se)}" y2="${ys(r.rel+1.96*r.se)}" stroke="${c}" stroke-width="1.2"/>`;
+const t=`data-tip="${ptTip(r,kp).replace(/"/g,"&quot;")}"`;
+if(k==="pisa")s+=`<circle class="pt" ${t} cx="${x}" cy="${y}" r="6" fill="${c}" stroke="#fff" stroke-width="1.5"/>`;else if(k==="piaac")s+=`<polygon class="pt" ${t} points="${x},${y-7} ${x+7},${y} ${x},${y+7} ${x-7},${y}" fill="${c}" stroke="#fff" stroke-width="1.5"/>`;else s+=`<rect class="pt" ${t} x="${x-5}" y="${y-5}" width="10" height="10" fill="${c}" stroke="#fff" stroke-width="1.5"/>`});
+if(document.getElementById("anot").checked){const lab=(gads,pet,txt,dx,dy)=>{const p=pts.find(r=>r.gads==gads&&r.petijums===pet);if(!p)return;s+=`<line x1="${p.x}" x2="${p.x+dx*0.85}" y1="${p.y}" y2="${p.y+dy*0.85}" stroke="#777"/><text x="${p.x+dx}" y="${p.y+dy+4}" font-size="11.5" fill="#222" text-anchor="${dx<0?"end":"start"}">${txt}</text>`};
+lab(2025,"PISA lasīšana",`PISA 2025: ${f1(pts.find(r=>r.gads==2025&&kind(r.petijums)==="pisa")?.rel??0)}`,-50,-40);lab(2018,"PISA lasīšana","PISA 2018",-10,-40);lab(2021,"PIRLS lasīšana",`PIRLS 2021 jau 4. klasē: ${f1(pts.find(r=>r.gads==2021&&kind(r.petijums)==="pirls")?.rel??0)}`,-40,30);lab(2019,"TIMSS4 dabaszinātnes","TIMSS 2019 (4. kl.)",-60,26);lab(2003,"PISA lasīšana","PISA 2003: ap vidējo",0,-34)}}
+const items=[];vs.forEach(v=>items.push({shape:"line",c:VCOL[v],dash:v!=="PISA + PIRLS",t:"modeļa aplēse: "+v}));
+if(g==="LVA A")items.push({shape:"circ",c:C.pisa,t:"PISA lasīšana, 15 g."},{shape:"rect",c:C.pirls,t:"PIRLS lasīšana, 4. kl."},{shape:"rect",c:C.timss,t:"TIMSS matemātika / dabaszin., 4. kl."},{shape:"rect",c:C.iccs,t:"ICCS / ICILS, 8. kl."},{shape:"diam",c:C.piaac,t:"PIAAC pieaugušie 2023, pēc dz. gada"});
+s+=legend(items,m.l+12,m.t+10);svg.innerHTML=s;
+const P=g==="LVA A"?D.merijumi.filter(r=>kind(r.petijums)==="pisa"):[];const p25=P.find(r=>r.gads==2025),p18=P.find(r=>r.gads==2018),p03=P.find(r=>r.gads==2003);
+let own25,rf25,own18,rf18;if(kp==="galvenā valoda"){own25=D.absol.find(q=>q.grupa==="LVA A"&&q.gads==2025);rf25=D.kopa7.find(q=>q.kopa===kp&&q.gads==2025);own18=D.absol.find(q=>q.grupa==="LVA A"&&q.gads==2018);rf18=D.kopa7.find(q=>q.kopa===kp&&q.gads==2018)}
+const r25=p25?(kp==="galvenā valoda"&&own25&&rf25?own25.est-rf25.est:p25.rel):null,r18=p18?(kp==="galvenā valoda"&&own18&&rf18?own18.est-rf18.est:p18.rel):null;
+const tr=D.trajektorija.filter(r=>r.grupa===g&&r.variants==="PISA + PIRLS");const first=tr.find(r=>r.rel+1.96*r.se<0);
+let F="";if(g==="LVA A"){F+=`<div class="f"><div class="k">PISA 2025 paaudze (dz. 2009)</div><div class="v">${r25!==null?f1(r25):"—"} punkti</div><div class="d">pret 7 valstu vidējo (${kp}); PIRLS 2021 tā pati paaudze 4. klasē: ${f1(D.merijumi.find(r=>r.gads==2021&&kind(r.petijums)==="pirls")?.rel??0)}</div></div>`;
+F+=`<div class="f"><div class="k">Pārmaiņa kopš PISA 2018</div><div class="v">${r25!==null&&r18!==null?f1(r25-r18):"—"} punkti</div><div class="d">relatīvā vieta 2018: ${r18!==null?f1(r18):"—"}, 2025: ${r25!==null?f1(r25):"—"}. Lielākā daļa absolūtā krituma (−27) ir kopīga ar citām valstīm.</div></div>`;
+F+=`<div class="f"><div class="k">No kuras paaudzes modelis ir droši zem nulles</div><div class="v">${first?"dz. "+first.b:"—"}</div><div class="d">${first?"PISA gads ≈ "+(first.b+16)+"; pirms tam intervāls ietver nulli":"visā rindā intervāls ietver nulli"}. PISA 2003 paaudze (dz. 1987): ${p03?f1(p03.rel):"—"}.</div></div>`}
+else{const last=tr[tr.length-1];F+=`<div class="f"><div class="k">${NOS[g]||g}: jaunākā paaudze modelī</div><div class="v">${last?f1(last.rel):"—"} punkti</div><div class="d">dz. ${last?last.b:""}; pret 7 valstu vidējo, kurā ${NOS[g]||g} pati ietilpst. Mērījumu punkti rādīti tikai Latvijai; citām valstīm skat. absolūto skatu.</div></div>`}
+document.getElementById("fakti").innerHTML=F;
+document.getElementById("foot").innerHTML=`Metode: KFAS lokālā līmeņa stāvokļa telpas modelis pa dzimšanas gadiem (docs/61 3e, docs/73); līkne pārbīdīta uz valsts vidējo relatīvo PISA līmeni, lai sakristu ar punktiem. PISA punktiem atskaite pēc izvēles; līknei un IEA punktiem — visi 7 valstu skolēni. Saites kļūda relatīvajā vietā izkrīt. Avots: R/pisa2025/70_vizualizacijas.R, 67b, 67c; prognozes paaudzu_modelis_petijumi.csv.`;
+bindTips()}
+function drawAbs(){const g=sel.value,kp=document.getElementById("kopa").value;const ys=v=>m.t+(600-v)/240*(H-m.t-m.b);let s=axes(ys,[360,380,400,420,440,460,480,500,520,540,560,580,600],"abs");
+const band=(t,c)=>!document.getElementById("josla").checked||t.length<2?"":`<path d="M${t.map(r=>xs(r.b)+","+ys(r.est+1.96*r.se)).join("L")}L${t.slice().reverse().map(r=>xs(r.b)+","+ys(r.est-1.96*r.se)).join("L")}Z" fill="${c}" opacity=".12"/>`;
+const ser=(t,c,dash,nos)=>{let o=band(t,c);o+=`<path d="M${t.map(r=>xs(r.b)+","+ys(r.est)).join("L")}" fill="none" stroke="${c}" stroke-width="2.4" ${dash?'stroke-dasharray="6,4"':""}/>`;t.forEach(r=>{o+=`<line x1="${xs(r.b)}" x2="${xs(r.b)}" y1="${ys(r.est-1.96*r.se)}" y2="${ys(r.est+1.96*r.se)}" stroke="${c}"/><circle class="pt" data-tip="${nos}, PISA ${r.gads} (paaudze dz. ${Math.round(r.b)}): ${String(r.est).replace(".",",")} punkti ±${f1(1.96*r.se).replace("+","")}" cx="${xs(r.b)}" cy="${ys(r.est)}" r="5.5" fill="${c}" stroke="#fff" stroke-width="1.5"/>`});return o};
+const ref=D.kopa7.filter(r=>r.kopa===kp).sort((a,b)=>a.b-b.b);s+=ser(ref,C.ref,true,"7 valstu vidējais ("+kp+")");
+const own=D.absol.filter(r=>r.grupa===g).sort((a,b)=>a.b-b.b);s+=ser(own,C.pirls,false,NOS[g]||g);
+if(document.getElementById("mer").checked&&g==="LVA A"){D.absol_iea.forEach(r=>{if(r.b<1984||r.b>2014)return;const k=kind(r.petijums),c=C[k];s+=`<line x1="${xs(r.b)}" x2="${xs(r.b)}" y1="${ys(r.est-1.96*r.se)}" y2="${ys(r.est+1.96*r.se)}" stroke="${c}"/><rect class="pt" data-tip="${r.petijums.replace("TIMSS4","TIMSS")} ${r.gads} (paaudze dz. ${Math.round(r.b)}): ${String(r.est).replace(".",",")} punkti savā skalā (IEA vidējais 500) — ar PISA skalu nav tieši salīdzināms" x="${xs(r.b)-5}" y="${ys(r.est)-5}" width="10" height="10" fill="${c}" stroke="#fff" stroke-width="1.5"/>`})}
+const items=[{shape:"line",c:C.pirls,t:(NOS[g]||g)+": PISA lasīšana"},{shape:"line",c:C.ref,dash:true,t:"7 valstu vidējais ("+kp+")"}];if(g==="LVA A")items.push({shape:"rect",c:C.pirls,t:"PIRLS 4. kl. (IEA skala, 500)"},{shape:"rect",c:C.timss,t:"TIMSS 4. kl. (IEA skala)"},{shape:"rect",c:C.iccs,t:"ICCS / ICILS 8. kl. (IEA skala)"});
+s+=legend(items,m.l+12,H-m.b-14-items.length*17-24);svg.innerHTML=s;
+const o25=own.find(r=>r.gads==2025),o18=own.find(r=>r.gads==2018),o22=own.find(r=>r.gads==2022),f25=ref.find(r=>r.gads==2025);
+document.getElementById("fakti").innerHTML=`<div class="f"><div class="k">${NOS[g]||g}, PISA 2025</div><div class="v">${o25?String(o25.est).replace(".",","):"—"}</div><div class="d">7 valstu vidējais (${kp}): ${f25?String(f25.est).replace(".",","):"—"}</div></div><div class="f"><div class="k">Pārmaiņa 2022 → 2025</div><div class="v">${o25&&o22?f1(o25.est-o22.est):"—"}</div><div class="d">7 valstis: ${f25&&ref.find(r=>r.gads==2022)?f1(f25.est-ref.find(r=>r.gads==2022).est):"—"}</div></div><div class="f"><div class="k">Pārmaiņa 2018 → 2025</div><div class="v">${o25&&o18?f1(o25.est-o18.est):"—"}</div><div class="d">7 valstis: ${f25&&ref.find(r=>r.gads==2018)?f1(f25.est-ref.find(r=>r.gads==2018).est):"—"}</div></div>`;
+document.getElementById("foot").innerHTML=`Absolūtais skats: PISA lasīšanas vidējie ar 95 % intervālu; 7 valstu vidējais ${kp}. IEA punkti katrs savā 500 punktu skalā — tie rāda paaudzes līmeni agrākā vecumā, ne PISA punktus. Avots: R/pisa2025/70_vizualizacijas.R.`;
+bindTips()}
+function bindTips(){const box=svg.parentElement;svg.querySelectorAll(".pt").forEach(el=>{el.addEventListener("mousemove",e=>{tip.style.display="block";tip.textContent=el.dataset.tip;const r=box.getBoundingClientRect();tip.style.left=Math.min(e.clientX-r.left+14,r.width-310)+"px";tip.style.top=(e.clientY-r.top+14)+"px"});el.addEventListener("mouseleave",()=>tip.style.display="none")})}
+function table(){const P=D.prognozes;const vv=["tikai PISA","PISA + PIRLS","visi"].filter(v=>P.some(r=>r.variants===v));const ms=[...new Set(P.map(r=>r.merkis))].sort();
+let h="<tr><th>PISA cikls</th><th>Faktiskā relatīvā pārmaiņa</th>"+vv.map(v=>`<th>Prognoze: ${v}</th>`).join("")+"</tr>";
+ms.forEach(mk=>{const f=P.find(r=>r.merkis===mk);h+=`<tr><td>${mk}</td><td>${f?f1(f.fakt):""}</td>`+vv.map(v=>{const r=P.find(q=>q.merkis===mk&&q.variants===v);if(!r)return"<td></td>";const ok=Math.sign(r.prog_rel)===Math.sign(f.fakt);return `<td class="${ok?"ok":"no"}">${f1(r.prog_rel)} ${ok?"✓":"✗"}</td>`}).join("")+"</tr>"});document.getElementById("t").innerHTML=h}
+function draw(){document.getElementById("kopahint").style.display="inline";if(skats==="abs")drawAbs();else drawRel()}
+document.querySelectorAll("input,select").forEach(e=>e.addEventListener("change",draw));table();draw();
+</script></body></html>
