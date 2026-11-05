@@ -315,6 +315,42 @@ const GRAFIKI = (() => {
   }
 
 
+  // 21. Rīgas skolu izkliede 9. klases eksāmenā (9. sadaļa)
+  function skolu_ce(root, D) {
+    const ALLD = D.skolu_ce; let eks = "LAT", mg = "2024"; const UN = { 1: "Rīga", 2: "valstspilsētas", 3: "pilsētas", 4: "lauki" }, TN = { 1: "valsts ģimnāzija", 2: "vidusskola", 3: "pamatskola", 0: "cits tips" }; const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    root.innerHTML = ""; const top = el("div", { class: "pz-tools" }); const host = el("div"); root.append(top, host);
+    const ROWS = [["Rīga: valsts ģimnāzijas", d => d.u === 1 && d.t === 1], ["Rīga: vidusskolas", d => d.u === 1 && d.t === 2], ["Rīga: pamatskolas", d => d.u === 1 && d.t === 3],
+      ["Rīga: visas skolas", d => d.u === 1], ["valstspilsētas", d => d.u === 2], ["pilsētas", d => d.u === 3], ["lauki", d => d.u === 4]];
+    const q = (a, p) => { const b = a.slice().sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.floor(p * (b.length - 1)))]; };
+    const hash = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 1000; return h / 1000; };
+    function draw() {
+      const D = ALLD.filter(d => d.e === eks && d.m === mg); const W = 1100, rowH = 56, m = { l: 190, r: 40, t: 34, b: 44 }, H = m.t + ROWS.length * rowH + m.b;
+      const xs = v => m.l + (v / 100) * (W - m.l - m.r);
+      let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;font-family:inherit" role="img" aria-label="Skolu vidējie 9. klases eksāmenā">`;
+      for (let v = 0; v <= 100; v += 10) s += `<line x1="${xs(v)}" x2="${xs(v)}" y1="${m.t - 6}" y2="${H - m.b + 4}" class="grid"/><text x="${xs(v)}" y="${H - m.b + 20}" class="tick" text-anchor="middle">${v}</text>`;
+      s += `<text x="${(m.l + W - m.r) / 2}" y="${H - 6}" class="alab" text-anchor="middle">skolas vidējais kopvērtējums, % no maksimālā</text>`;
+      ROWS.forEach(([nos, f], i) => {
+        const g = D.filter(f); const y0 = m.t + i * rowH; const yc = y0 + rowH / 2; const vals = g.map(d => d.v);
+        if (i) s += `<line x1="${m.l}" x2="${W - m.r}" y1="${y0}" y2="${y0}" class="grid" opacity=".5"/>`;
+        s += `<text x="${m.l - 10}" y="${yc - 4}" class="small" fill="var(--ink)" text-anchor="end" font-weight="${nos.startsWith("Rīga: visas") ? 700 : 500}">${esc(nos)}</text><text x="${m.l - 10}" y="${yc + 12}" class="small" fill="var(--muted)" text-anchor="end">${g.length} skolas</text>`;
+        if (!g.length) return;
+        const p10 = q(vals, .1), p50 = q(vals, .5), p90 = q(vals, .9);
+        s += `<rect x="${xs(p10)}" y="${yc - 14}" width="${xs(p90) - xs(p10)}" height="28" fill="var(--s1)" opacity=".10"/>`;
+        g.forEach(d => { const jy = yc + (hash(d.s + d.n + d.v) - .5) * 24; const c = d.t === 1 ? C.s1 : d.t === 3 ? C.s2 : d.u === 1 ? C.c : "var(--ink-2)";
+          s += `<circle cx="${xs(d.v)}" cy="${jy}" r="3.6" fill="${c}" opacity=".55" stroke="var(--card)" stroke-width=".6"><title>${d.s ? esc(d.s) : "skola ārpus Rīgas (" + UN[d.u] + ")"}; ${TN[d.t]}; ${d.n} kārtotāji; ${f1(d.v, 1)} %</title></circle>`; });
+        s += `<line x1="${xs(p50)}" x2="${xs(p50)}" y1="${yc - 17}" y2="${yc + 17}" stroke="var(--ink)" stroke-width="2.2"/>`;
+        s += `<text x="${xs(p90) + 6}" y="${yc - 18}" class="small" fill="var(--muted)">P10 ${f1(p10, 0)}, mediāna ${f1(p50, 0)}, P90 ${f1(p90, 0)}</text>`;
+      });
+      s += "</svg>"; host.innerHTML = s;
+    }
+    top.append(el("span", { class: "pz-lab" }, "Eksāmens:"), PZ.sel([{ v: "LAT", t: "latviešu valoda 9. klasei" }, { v: "MAT", t: "matemātika 9. klasei" }], eks, v => { eks = v; draw(); }),
+      PZ.sel([{ v: "2022", t: "2022./23." }, { v: "2023", t: "2023./24." }, { v: "2024", t: "2024./25." }], mg, v => { mg = v; draw(); }));
+    draw();
+    root.append(el("div", { class: "pz-legend" }), el("p", { class: "pz-note" }, "Katrs punkts ir viena skola ar vismaz 10 kārtotājiem (pele uz punkta rāda Rīgas skolas nosaukumu); melnā svītra ir skolu mediāna, zilā josla no zemākās desmitdaļas skolu līdz augšējai (P10 līdz P90). Krāsas: zils valsts ģimnāzijas, oranžs pamatskolas, violets pārējās Rīgas skolas, pelēks pārējās. Avots: VIAA kārtotāju līmeņa dati, R/pisa2025/89, docs/92."));
+    const leg = root.querySelector(".pz-legend"); [[C.s1, "valsts ģimnāzija"], [C.s2, "pamatskola"], [C.c, "cita Rīgas skola"], ["var(--ink-2)", "cita skola ārpus Rīgas"]].forEach(([c, n]) => { const it = el("span"); it.append(legKeyDot(c), document.createTextNode(n)); leg.append(it); });
+  }
+  function legKeyDot(c) { const sp = el("span"); sp.setAttribute("style", `display:inline-block;width:10px;height:10px;border-radius:50%;background:${c};margin-right:6px;vertical-align:-1px`); return sp; }
+
   // 20. Skolu faktors: apdzīvotā vieta (9. sadaļa)
   function skolas(root, D) {
     const S = D.skolas; const UN = ["ciems, līdz 3 tūkst.", "mazpilsēta, 3 līdz 15 tūkst.", "pilsēta, 15 līdz 100 tūkst.", "Rīga"]; const UC = [C.k, C.s2, C.c, C.s1];
@@ -387,7 +423,7 @@ const GRAFIKI = (() => {
     root.append(el("p", { class: "pz-note" }, "Cikls atkārtojas ar katru mērījumu kārtu. Prognoze uz priekšu dod laiku lēmumam; pārbaude atpakaļ pret prospektīvajiem un retrospektīvajiem datiem labo gan modeli, gan secinājumus par intervenču efektiem. Šajā ziņojumā 2025. gada rezultāts ir šāda pārbaude: paaudžu modeļa prognoze −4,3 pret faktisko −4,7."));
   }
 
-  const ALL = { skolas, escs, cikls, politika, garie, korigeta, lexis, panelis, efekti, dfm, ce, dd, talis, izdevumi_rinda, izdevumi_atlikumi, hbsc_exante, hbsc_rinda, aploksne, atgriesanas, koridors, dalas };
+  const ALL = { skolu_ce, skolas, escs, cikls, politika, garie, korigeta, lexis, panelis, efekti, dfm, ce, dd, talis, izdevumi_rinda, izdevumi_atlikumi, hbsc_exante, hbsc_rinda, aploksne, atgriesanas, koridors, dalas };
   function init(D) { document.querySelectorAll("[data-chart]").forEach(root => { const f = ALL[root.dataset.chart]; if (!f) { root.textContent = "Grafiks nav atrasts: " + root.dataset.chart; return; } try { f(root, D); } catch (e) { root.textContent = "Grafika kļūda: " + e.message; console.error(root.dataset.chart, e); } }); }
   return { init, ALL, C, NOS, f1, fs, PISA_CIKLI };
 })();
