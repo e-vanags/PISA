@@ -315,6 +315,18 @@ const GRAFIKI = (() => {
   }
 
 
+  // 19. ESCS ceturtdaļas (9. sadaļa)
+  function escs(root, D) {
+    const E = D.escs; const QN = ["zemākā ceturtdaļa", "2. ceturtdaļa", "3. ceturtdaļa", "augstākā ceturtdaļa"]; const QC = [C.bad, C.s2, C.k, C.s1];
+    const ser = (g, layer, dash, suf) => [1, 2, 3, 4].map(q => ({ id: `${g}_Q${q}`, nos: `${suf}: ${QN[q - 1]}`, color: QC[q - 1], width: dash ? 1.8 : 2.4, dash, marker: dash ? "square" : undefined, band: !dash, layer,
+      pts: E[g].map(r => ({ x: r.gads, y: r[`Q${q}`], lo: r[`Q${q}`] - 1.96 * r[`Q${q}_se`], hi: r[`Q${q}`] + 1.96 * r[`Q${q}_se`] })), fmt: v => f1(v, 0), endLabel: dash ? undefined : QN[q - 1] }));
+    PZ.line(root, { w: 1100, h: 500, m: { l: 60, r: 175, t: 18, b: 44 }, title: "Lasīšana pa sociālā fona ceturtdaļām",
+      x: { min: 2002, max: 2026, ticks: PISA_CIKLI, tipLabel: "PISA cikls" }, y: { min: 400, max: 570, step: 20, label: "Lasītprasme, PISA punkti" },
+      layers: [{ id: "lva", nos: "latviešu valodas plūsma" }, { id: "v7", nos: "7 valstu vidējais", on: false }, { id: "visi", nos: "Latvija, visi skolēni", on: false }],
+      series: [...ser("LVA A", "lva", null, "latviešu valodas plūsma"), ...ser("7 valstis", "v7", "2,4", "7 valstis"), ...ser("LVA", "visi", "7,4", "Latvija, visi")],
+      piezime: "Ceturtdaļas pēc PISA sociāli ekonomiskā un kultūras statusa indeksa (ESCS) katras grupas un cikla iekšienē; 7 valstīm katras valsts ceturtdaļu vidējo vienkāršais vidējais. Joslas: 95 % intervāls (skolu klasteru sāknēšana). 2025. gadā bez ESCS ir 8 % latviešu valodas plūsmas skolēnu, tie lasa vājāk. Avots: R/pisa2025/87, docs/90." });
+  }
+
   // 18. Mērīšanas, prognozes un lēmumu cikls (19. sadaļa)
   function cikls(root) {
     root.innerHTML = ""; const on = { prog: false, parb: false };
@@ -363,7 +375,7 @@ const GRAFIKI = (() => {
     root.append(el("p", { class: "pz-note" }, "Cikls atkārtojas ar katru mērījumu kārtu. Prognoze uz priekšu dod laiku lēmumam; pārbaude atpakaļ pret prospektīvajiem un retrospektīvajiem datiem labo gan modeli, gan secinājumus par intervenču efektiem. Šajā ziņojumā 2025. gada rezultāts ir šāda pārbaude: paaudžu modeļa prognoze −4,3 pret faktisko −4,7."));
   }
 
-  const ALL = { cikls, politika, garie, korigeta, lexis, panelis, efekti, dfm, ce, dd, talis, izdevumi_rinda, izdevumi_atlikumi, hbsc_exante, hbsc_rinda, aploksne, atgriesanas, koridors, dalas };
+  const ALL = { escs, cikls, politika, garie, korigeta, lexis, panelis, efekti, dfm, ce, dd, talis, izdevumi_rinda, izdevumi_atlikumi, hbsc_exante, hbsc_rinda, aploksne, atgriesanas, koridors, dalas };
   function init(D) { document.querySelectorAll("[data-chart]").forEach(root => { const f = ALL[root.dataset.chart]; if (!f) { root.textContent = "Grafiks nav atrasts: " + root.dataset.chart; return; } try { f(root, D); } catch (e) { root.textContent = "Grafika kļūda: " + e.message; console.error(root.dataset.chart, e); } }); }
   return { init, ALL, C, NOS, f1, fs, PISA_CIKLI };
 })();

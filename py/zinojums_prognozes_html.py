@@ -389,6 +389,17 @@ def d_scenariji():
 # ---------------------------------------------------------------------------
 # 12. Garu tekstu lasīšana skolā, PISA 2018 ST154 (86b)
 # ---------------------------------------------------------------------------
+def d_escs():
+    """ESCS ceturtdaļu lasīšanas vidējie pa cikliem (R/pisa2025/87, escs_gradienti.csv)."""
+    out = {}
+    for r in lasit(OUT / "escs_gradienti.csv"):
+        if r["grupa"] not in ("LVA A", "7 valstis", "LVA") or not r["raditajs"].endswith("_vid") or not r["raditajs"].startswith("Q"):
+            continue
+        q = r["raditajs"][:2]
+        d = out.setdefault(r["grupa"], {}).setdefault(int(r["gads"]), {"gads": int(r["gads"])})
+        d[q] = num(r["est"]); d[q + "_se"] = num(r["se"])
+    return {g: [v[k] for k in sorted(v)] for g, v in out.items()}
+
 def d_garie():
     V = lasit(OUT / "st154_virs100.csv")
     K = lasit(OUT / "st154_garie_teksti.csv")
@@ -418,7 +429,7 @@ def atrast(nosaukums):
 
 
 def main():
-    dati = {"korigeta": d_korigeta(), "lexis": d_lexis(), "panelis": d_panelis(), "efekti": d_efekti(), "dfm": d_dfm(),
+    dati = {"escs": d_escs(), "korigeta": d_korigeta(), "lexis": d_lexis(), "panelis": d_panelis(), "efekti": d_efekti(), "dfm": d_dfm(),
             "ce": d_ce(), "dd": d_dd(), "talis": d_talis(), "izdevumi": d_izdevumi(), "hbsc": d_hbsc(),
             "aploksne": d_aploksne(), "atgriesanas": d_atgriesanas(), "scenariji": d_scenariji(), "garie": d_garie(), "politika": d_politika()}
     js = json.dumps(dati, ensure_ascii=False, separators=(",", ":"))
