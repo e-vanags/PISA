@@ -400,6 +400,18 @@ def d_escs():
         d[q] = num(r["est"]); d[q + "_se"] = num(r["se"])
     return {g: [v[k] for k in sorted(v)] for g, v in out.items()}
 
+def d_skolas():
+    """Lasīšana pēc skolas apdzīvotās vietas, latviešu valodas plūsma (R/pisa2025/89, skolu_pisa_urban.csv)."""
+    out = {}
+    for r in lasit(OUT / "skolu_pisa_urban.csv"):
+        if r["grupa"] not in ("LVA A", "LVA") or not (r["raditajs"].startswith("urb") and r["raditajs"].endswith("_vid")):
+            continue
+        k = "u" + r["raditajs"][3]
+        d = out.setdefault(r["grupa"], {}).setdefault(int(r["gads"]), {"gads": int(r["gads"])})
+        d[k] = num(r["est"]); d[k + "_se"] = num(r["se"])
+    return {g: [v[k] for k in sorted(v)] for g, v in out.items()}
+
+
 def d_garie():
     V = lasit(OUT / "st154_virs100.csv")
     K = lasit(OUT / "st154_garie_teksti.csv")
@@ -429,7 +441,7 @@ def atrast(nosaukums):
 
 
 def main():
-    dati = {"escs": d_escs(), "korigeta": d_korigeta(), "lexis": d_lexis(), "panelis": d_panelis(), "efekti": d_efekti(), "dfm": d_dfm(),
+    dati = {"skolas": d_skolas(), "escs": d_escs(), "korigeta": d_korigeta(), "lexis": d_lexis(), "panelis": d_panelis(), "efekti": d_efekti(), "dfm": d_dfm(),
             "ce": d_ce(), "dd": d_dd(), "talis": d_talis(), "izdevumi": d_izdevumi(), "hbsc": d_hbsc(),
             "aploksne": d_aploksne(), "atgriesanas": d_atgriesanas(), "scenariji": d_scenariji(), "garie": d_garie(), "politika": d_politika()}
     js = json.dumps(dati, ensure_ascii=False, separators=(",", ":"))
