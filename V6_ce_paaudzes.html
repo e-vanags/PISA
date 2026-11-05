@@ -74,4 +74,6 @@ if(document.getElementById("punkti").checked)pts.forEach(p=>{const t=`${sr.nos},
 if(sr.pisa)s+=`<path class="pt" data-tip="${t}" d="M${x-5},${y-5}L${x+5},${y+5}M${x-5},${y+5}L${x+5},${y-5}" stroke="${sr.krasa}" stroke-width="2"/><circle class="pt" data-tip="${t}" cx="${x}" cy="${y}" r="7" fill="transparent"/>`;else if(sr.klase===12)s+=`<rect class="pt" data-tip="${t}" x="${x-4}" y="${y-4}" width="8" height="8" fill="${sr.krasa}" stroke="#fff"/>`;else s+=`<circle class="pt" data-tip="${t}" cx="${x}" cy="${y}" r="4.2" fill="${sr.krasa}" stroke="#fff"/>`})});
 svg.innerHTML=s;const bx=svg.parentElement;svg.querySelectorAll(".pt").forEach(el=>{el.addEventListener("mousemove",e=>{tip.style.display="block";tip.textContent=el.dataset.tip;const r=bx.getBoundingClientRect();tip.style.left=Math.min(e.clientX-r.left+14,r.width-330)+"px";tip.style.top=(e.clientY-r.top+14)+"px"});el.addEventListener("mouseleave",()=>tip.style.display="none")})}
 draw();
-</script></body></html>
+</script><script>window.goatcounter={path:function(p){return p.replace(/index\.html$/,"").replace(/\/$/,"")||"/";}};</script>
+<script data-goatcounter="https://slowscience.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body></html>
