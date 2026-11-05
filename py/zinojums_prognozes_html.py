@@ -340,7 +340,9 @@ def d_aploksne():
     LV = [x for x in lasit(OUT / "aploksne_latvija.csv") if x["logs"] == "1" and x["kopa"] == "visi" and x["attirits"] == "nē"]
     latv = [{"joma": x["joma"], "valsts": x["valsts"], "no": int(x["no"]), "uz": int(x["uz"]), "l": r(num(x["l_no"]), 1), "g": r(num(x["gada"]), 2),
              "proc": r(num(x["procentile"]), 0)} for x in LV]
-    return {"punkti": punkti, "kvantiles": kvant, "latvija": latv}
+    valstis = sorted({x["valsts"] for x in punkti}); vi = {v: i for i, v in enumerate(valstis)}
+    kompakts = [[x["joma"], vi[x["valsts"]], x["no"], x["uz"], x["l"], x["g"], 1 if x["m"] else 0] for x in punkti]
+    return {"punkti_k": ["joma", "valsts", "no", "uz", "l", "g", "m"], "punkti_valstis": valstis, "punkti": kompakts, "kvantiles": kvant, "latvija": latv}
 
 
 def d_atgriesanas():
@@ -417,9 +419,9 @@ def d_skolu_ce():
     out = []
     for r in lasit(OUT / "skolu_ce.csv"):
         riga = r["urban_nos"] == "Rīga"
-        out.append({"e": r["eks"][:3], "m": r["mg"][:4], "s": r["skola"].strip('"') if riga else "", "u": {"Rīga": 1, "valstspilsētas": 2, "pilsētas": 3, "lauki": 4}.get(r["urban_nos"], 0),
-                    "t": {"valsts ģimnāzija": 1, "vidusskola": 2, "pamatskola": 3}.get(r["tips_nos"], 0), "n": int(r["n"]), "v": round(num(r["vid"]), 1)})
-    return out
+        out.append([r["eks"][:3], r["mg"][:4], r["skola"].strip('"') if riga else "", {"Rīga": 1, "valstspilsētas": 2, "pilsētas": 3, "lauki": 4}.get(r["urban_nos"], 0),
+                    {"valsts ģimnāzija": 1, "vidusskola": 2, "pamatskola": 3}.get(r["tips_nos"], 0), int(r["n"]), round(num(r["vid"]), 1)])
+    return {"k": ["e", "m", "s", "u", "t", "n", "v"], "r": out}
 
 
 def d_garie():

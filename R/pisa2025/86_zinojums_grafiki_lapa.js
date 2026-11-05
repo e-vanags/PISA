@@ -424,6 +424,12 @@ const GRAFIKI = (() => {
   }
 
   const ALL = { skolu_ce, skolas, escs, cikls, politika, garie, korigeta, lexis, panelis, efekti, dfm, ce, dd, talis, izdevumi_rinda, izdevumi_atlikumi, hbsc_exante, hbsc_rinda, aploksne, atgriesanas, koridors, dalas };
-  function init(D) { document.querySelectorAll("[data-chart]").forEach(root => { const f = ALL[root.dataset.chart]; if (!f) { root.textContent = "Grafiks nav atrasts: " + root.dataset.chart; return; } try { f(root, D); } catch (e) { root.textContent = "Grafika kļūda: " + e.message; console.error(root.dataset.chart, e); } }); }
+  // kompakto datu atpakošana (faila apjoma dēļ dati glabāti kā masīvi)
+  function atpakot(D) {
+    const obj = (k, a) => { const o = {}; k.forEach((n, i) => { o[n] = a[i]; }); return o; };
+    if (D.aploksne && D.aploksne.punkti_k) { const V = D.aploksne.punkti_valstis; D.aploksne.punkti = D.aploksne.punkti.map(a => { const o = obj(D.aploksne.punkti_k, a); o.valsts = V[o.valsts]; o.m = !!o.m; return o; }); delete D.aploksne.punkti_k; }
+    if (D.skolu_ce && D.skolu_ce.k) D.skolu_ce = D.skolu_ce.r.map(a => obj(D.skolu_ce.k, a));
+  }
+  function init(D) { atpakot(D); document.querySelectorAll("[data-chart]").forEach(root => { const f = ALL[root.dataset.chart]; if (!f) { root.textContent = "Grafiks nav atrasts: " + root.dataset.chart; return; } try { f(root, D); } catch (e) { root.textContent = "Grafika kļūda: " + e.message; console.error(root.dataset.chart, e); } }); }
   return { init, ALL, C, NOS, f1, fs, PISA_CIKLI };
 })();
